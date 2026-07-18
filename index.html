@@ -447,84 +447,72 @@
             document.getElementById('preview-modal').classList.remove('hidden');
         }
 
-        function simpanDanPratinjau(event) {
-            event.preventDefault();
+        // 1. Ganti fungsi Simpan & Pratinjau ini
+function simpanDanPratinjau(event) {
+    if (event) event.preventDefault();
 
-            const jenis = document.getElementById('jenisLaporan').value;
-            const tanggal = document.getElementById('tanggal').value;
-            const kegiatan = document.getElementById('kegiatan').value;
-            const tempat = document.getElementById('tempat').value;
-            const mitra = document.getElementById('mitra').value;
-            const uraian = document.getElementById('uraian').value;
-            const dpl = document.getElementById('dpl').value;
+    const jenis = document.getElementById('jenisLaporan').value;
+    const tanggal = document.getElementById('tanggal').value;
+    const kegiatan = document.getElementById('kegiatan').value;
+    const tempat = document.getElementById('tempat').value;
+    const mitra = document.getElementById('mitra').value;
+    const uraian = document.getElementById('uraian').value;
+    const dpl = document.getElementById('dpl').value;
 
-            const checkboxes = document.querySelectorAll('input[name="pesertaAbsen"]:checked');
-            const peserta = Array.from(checkboxes).map(cb => cb.value).join(', ');
+    // Pastikan checkbox terambil dengan benar
+    const checkboxes = document.querySelectorAll('input[name="pesertaAbsen"]:checked');
+    const pesertaArray = Array.from(checkboxes).map(cb => cb.value);
+    const pesertaText = pesertaArray.length > 0 ? pesertaArray.join(', ') : '-';
 
-            currentReportData = { jenis: jenis, tanggalInput: tanggal };
+    currentReportData = { jenis: jenis, tanggalInput: tanggal };
 
-            document.getElementById('pdf-title-jenis').innerText = jenis;
-            document.getElementById('pdf-hari').innerText = formatTanggalIndo(tanggal);
-            document.getElementById('pdf-kegiatan').innerText = kegiatan;
-            document.getElementById('pdf-tempat').innerText = tempat;
-            document.getElementById('pdf-mitra').innerText = mitra;
-            document.getElementById('pdf-absen').innerText = peserta || '-';
-            document.getElementById('pdf-uraian').innerText = uraian;
-            document.getElementById('pdf-dpl').innerText = dpl;
+    document.getElementById('pdf-title-jenis').innerText = jenis;
+    document.getElementById('pdf-hari').innerText = formatTanggalIndo(tanggal);
+    document.getElementById('pdf-kegiatan').innerText = kegiatan;
+    document.getElementById('pdf-tempat').innerText = tempat;
+    document.getElementById('pdf-mitra').innerText = mitra;
+    document.getElementById('pdf-absen').innerText = pesertaText; // Ini pasti muncul sekarang
+    document.getElementById('pdf-uraian').innerText = uraian;
+    document.getElementById('pdf-dpl').innerText = dpl;
 
-            document.getElementById('preview-modal').classList.remove('hidden');
-        }
+    document.getElementById('preview-modal').classList.remove('hidden');
+}
 
-        function tutupPratinjau() {
-            document.getElementById('preview-modal').classList.add('hidden');
-        }
+// 2. Ganti fungsi Cetak PDF dengan logika 'Clone' yang bersih
+function cetakPDF() {
+    const btnCetak = document.getElementById('btn-cetak');
+    btnCetak.innerText = "Memproses...";
+    btnCetak.disabled = true;
 
-        function cetakPDF() {
-            const btnCetak = document.getElementById('btn-cetak');
-            const originalCetakHtml = btnCetak.innerHTML;
-            btnCetak.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Menyusun...`;
-            btnCetak.disabled = true;
+    // Ambil elemen asli
+    const sourceElement = document.getElementById('pdf-template');
+    
+    // Buat kloningan elemen agar tidak mengganggu tampilan layar
+    const clone = sourceElement.cloneNode(true);
+    clone.style.width = "700px"; // Ukuran standar A4
+    clone.style.padding = "20px";
+    clone.style.backgroundColor = "white";
+    clone.style.color = "black";
+    
+    // Pastikan elemen kloningan terlihat (hapus class hidden jika ada)
+    clone.classList.remove('hidden');
+    document.body.appendChild(clone);
 
-            const modal = document.getElementById('preview-modal');
-            modal.scrollTo(0, 0);
+    const opt = {
+        margin:       10,
+        filename:     `Laporan_${document.getElementById('pdf-title-jenis').innerText}_${new Date().getTime()}.pdf`,
+        image:        { type: 'jpeg', quality: 1 },
+        html2canvas:  { scale: 2, useCORS: true },
+        jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+    };
 
-            const element = document.getElementById('pdf-template');
-            
-            // FIX 3 Diterapkan: Memaksa elemen memiliki rasio lebar A4 (794px) agar PDF proporsional
-            const originalWidth = element.style.width;
-            const originalMaxWidth = element.style.maxWidth;
-            element.style.width = '794px';
-            element.style.maxWidth = '794px';
-
-            const safeDate = currentReportData.tanggalInput ? currentReportData.tanggalInput.substring(0,10).replace(/-/g, "") : "Riwayat";
-            const fileName = `Catatan_Harian_${currentReportData.jenis || 'Kegiatan'}_${safeDate}.pdf`;
-
-            const opt = {
-                margin:       15, // Memberikan margin tepi kertas sebesar 15mm agar rapi
-                filename:     fileName,
-                image:        { type: 'jpeg', quality: 1 },
-                html2canvas:  { 
-                    scale: 2, 
-                    useCORS: true, 
-                    scrollY: 0,
-                    windowWidth: 794 // Sinkronisasi kanvas dengan rasio lebar A4
-                },
-                jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
-            };
-
-            html2pdf().set(opt).from(element).save().then(() => {
-                // Kembalikan style elemen ke bentuk aslinya (responsif)
-                element.style.width = originalWidth;
-                element.style.maxWidth = originalMaxWidth;
-                
-                btnCetak.innerHTML = originalCetakHtml;
-                btnCetak.disabled = false;
-            }).catch(err => {
-                alert('Terjadi kesalahan saat mencetak PDF.');
-                btnCetak.innerHTML = originalCetakHtml;
-                btnCetak.disabled = false;
-            });
-        }
+    html2pdf().set(opt).from(clone).save().then(() => {
+        // Hapus elemen kloningan setelah selesai
+        document.body.removeChild(clone);
+        btnCetak.innerText = "Cetak PDF";
+        btnCetak.disabled = false;
+    });
+}
     </script>
 </body>
 </html>
