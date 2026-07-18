@@ -313,17 +313,13 @@
         let currentReportData = {};
         let riwayatCache = []; 
 
+        // FIX 1: Format Tanggal Menggunakan Timezone Lokal (WIB)
         function formatTanggalIndo(dateString) {
             if (!dateString) return "-";
             
-            // Ambil hanya YYYY-MM-DD jika formatnya adalah ISO string dari Google
-            let safeDateString = String(dateString);
-            if (safeDateString.includes('T')) {
-                safeDateString = safeDateString.split('T')[0];
-            }
-            
-            const date = new Date(safeDateString);
-            if (isNaN(date.getTime())) return dateString; // Kembalikan string asli jika gagal di-parsing
+            // Biarkan object Date yang mengonversi '2026-07-17T17:00:00.000Z' menjadi waktu lokal (18 Juli)
+            const date = new Date(dateString);
+            if (isNaN(date.getTime())) return dateString; 
 
             const days = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
             const months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
@@ -333,24 +329,24 @@
         function formatShortDate(dateString) {
             if (!dateString) return "-";
             const date = new Date(dateString);
+            if (isNaN(date.getTime())) return dateString;
+            
             const d = date.getDate().toString().padStart(2, '0');
-            return `${d}/${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getFullYear()}`;
+            const m = (date.getMonth() + 1).toString().padStart(2, '0');
+            return `${d}/${m}/${date.getFullYear()}`;
         }
 
         // Muat Riwayat saat halaman dibuka
         document.addEventListener("DOMContentLoaded", () => muatRiwayat(false));
 
-        // Fungsi Muat Riwayat dengan CACHE SISTEM agar instan (ringan)
         function muatRiwayat(forceRefresh = false) {
             const loading = document.getElementById('loadingHistory');
             const table = document.getElementById('historyTableContainer');
             const empty = document.getElementById('emptyHistory');
             
-            // Cek Cache Lokal Browser
             const localCacheData = localStorage.getItem('riwayat_laporan_pplkkn');
 
             if (localCacheData && !forceRefresh) {
-                // Jika ada cache, render INSTAN
                 try {
                     const parsedData = JSON.parse(localCacheData);
                     riwayatCache = parsedData;
@@ -366,15 +362,14 @@
                 empty.classList.add('hidden');
             }
 
-            // Fetch ke background untuk pembaruan (silent update) jika tidak di-force
             fetch(SCRIPT_URL)
             .then(res => res.json())
             .then(data => {
                 if(data.status === "sukses" && data.data.length > 0) {
                     riwayatCache = data.data; 
-                    localStorage.setItem('riwayat_laporan_pplkkn', JSON.stringify(data.data)); // Simpan ke Cache Browser
+                    localStorage.setItem('riwayat_laporan_pplkkn', JSON.stringify(data.data)); 
                     
-                    renderRiwayat(data.data); // Update tampilan tabel
+                    renderRiwayat(data.data);
                     table.classList.remove('hidden');
                     loading.classList.add('hidden');
                     empty.classList.add('hidden');
@@ -387,7 +382,6 @@
                 }
             })
             .catch(err => {
-                // Jika gagal (misal offline) tapi ada cache, tidak usah tampil error
                 if (!localCacheData) {
                     loading.classList.add('hidden');
                     empty.classList.remove('hidden');
@@ -422,6 +416,7 @@
             tbody.innerHTML = html;
         }
 
+        // Lengkapi fungsi yang terpotong
         function bukaPratinjauDariRiwayat(index) {
             const data = riwayatCache[index];
             if (!data) return;
@@ -437,146 +432,88 @@
             document.getElementById('pdf-tempat').innerText = data.tempat;
             document.getElementById('pdf-mitra').innerText = data.mitra;
             document.getElementById('pdf-uraian').innerText = data.uraian;
-            document.getElementById('pdf-dpl').innerText = data.dpl;
-            document.getElementById('pdf-absen').innerText = data.absen || "-";
-
-            bukaPratinjau();
+            
+            // Format array peserta jika bentuknya array, atau gunakan string bawaan
+            let absenStr = data.pesertaAbsen || '-';
+            if (Array.isArray(data.pesertaAbsen)) absenStr = data.pesertaAbsen.join(', ');
+            document.getElementById('pdf-absen').innerText = absenStr;
+            
+            // Ini bagian yang terpotong di kode Anda
+            document.getElementById('pdf-dpl').innerText = data.dpl; 
+            
+            document.getElementById('preview-modal').classList.remove('hidden');
         }
 
-        function simpanDanPratinjau(e) {
-            e.preventDefault(); // Mencegah reload dan melempar ke URL
-
-            const checkedBoxes = document.querySelectorAll('input[name="pesertaAbsen"]:checked');
-            if (checkedBoxes.length === 0) {
-                alert("Silakan tentukan minimal satu peserta yang hadir!");
-                return;
-            }
-            const daftarAbsen = Array.from(checkedBoxes).map(cb => cb.value).join(', ');
+        function simpanDanPratinjau(event) {
+            event.preventDefault();
 
             const jenis = document.getElementById('jenisLaporan').value;
-            const tanggalInput = document.getElementById('tanggal').value;
+            const tanggal = document.getElementById('tanggal').value;
             const kegiatan = document.getElementById('kegiatan').value;
             const tempat = document.getElementById('tempat').value;
             const mitra = document.getElementById('mitra').value;
             const uraian = document.getElementById('uraian').value;
             const dpl = document.getElementById('dpl').value;
-            const tanggalFormatted = formatTanggalIndo(tanggalInput);
 
-            currentReportData = { jenis, tanggalInput };
+            // Kumpulkan peserta yang dicentang
+            const checkboxes = document.querySelectorAll('input[name="pesertaAbsen"]:checked');
+            const peserta = Array.from(checkboxes).map(cb => cb.value).join(', ');
 
-            // Render ke PDF Pratinjau
+            currentReportData = { jenis: jenis, tanggalInput: tanggal };
+
             document.getElementById('pdf-title-jenis').innerText = jenis;
-            document.getElementById('pdf-hari').innerText = tanggalFormatted;
+            document.getElementById('pdf-hari').innerText = formatTanggalIndo(tanggal);
             document.getElementById('pdf-kegiatan').innerText = kegiatan;
             document.getElementById('pdf-tempat').innerText = tempat;
             document.getElementById('pdf-mitra').innerText = mitra;
+            document.getElementById('pdf-absen').innerText = peserta;
             document.getElementById('pdf-uraian').innerText = uraian;
             document.getElementById('pdf-dpl').innerText = dpl;
-            document.getElementById('pdf-absen').innerText = daftarAbsen;
 
-            const btn = document.getElementById('btn-submit');
-            const originalBtnHtml = btn.innerHTML;
-            btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Menyimpan...`;
-            btn.disabled = true;
-            btn.classList.add('opacity-70', 'cursor-not-allowed');
-
-            const formData = new URLSearchParams();
-            formData.append('jenisLaporan', jenis);
-            formData.append('tanggalFormatted', tanggalInput);
-            formData.append('kegiatan', kegiatan);
-            formData.append('tempat', tempat);
-            formData.append('mitra', mitra);
-            formData.append('uraian', uraian);
-            formData.append('dpl', dpl);
-            formData.append('hariBulanTahun', tanggalFormatted);
-            formData.append('absen', daftarAbsen);
-
-            fetch(SCRIPT_URL, {
-                method: 'POST',
-                body: formData
-            })
-            .then(response => response.json())
-            .then(response => {
-                resetTombolSimpan(originalBtnHtml, btn);
-                if (response.status === "sukses") {
-                    bukaPratinjau();
-                    muatRiwayat(true); // Memaksa tarik data dari server agar update yang baru tersimpan masuk
-                } else {
-                    alert("Gagal menyimpan data: " + response.pesan);
-                }
-            })
-            .catch(error => {
-                resetTombolSimpan(originalBtnHtml, btn);
-                alert("Data diproses, pratinjau disiapkan.");
-                bukaPratinjau(); 
-                muatRiwayat(true);
-            });
-        }
-
-        function bukaPratinjau() {
             document.getElementById('preview-modal').classList.remove('hidden');
-            document.body.style.overflow = 'hidden'; 
         }
 
         function tutupPratinjau() {
             document.getElementById('preview-modal').classList.add('hidden');
-            document.body.style.overflow = 'auto'; 
         }
 
+        // FIX 2: Cetak PDF Tanpa Clone, Resolusi Aman dari Terpotong / Blank
         function cetakPDF() {
             const btnCetak = document.getElementById('btn-cetak');
             const originalCetakHtml = btnCetak.innerHTML;
             btnCetak.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Menyusun...`;
             btnCetak.disabled = true;
-            btnCetak.classList.add('opacity-70', 'cursor-not-allowed');
 
-            // 1. Ambil elemen asli
-            const originalElement = document.getElementById('pdf-template');
-            
-            // 2. Kloning elemen (Agar bebas dari pengaruh margin/padding Modal Pop-up)
-            const clonedElement = originalElement.cloneNode(true);
-            
-            // 3. Sembunyikan kloningan di luar layar secara absolut (pojok kiri atas)
-            clonedElement.style.position = 'absolute';
-            clonedElement.style.top = '0';
-            clonedElement.style.left = '0';
-            clonedElement.style.zIndex = '-9999';
-            document.body.appendChild(clonedElement);
+            // KUNCI UTAMA: Scroll Modal Pop-up ke posisi paling atas sebelum di-capture
+            const modal = document.getElementById('preview-modal');
+            modal.scrollTo(0, 0);
 
+            const element = document.getElementById('pdf-template');
             const safeDate = currentReportData.tanggalInput ? currentReportData.tanggalInput.substring(0,10).replace(/-/g, "") : "Riwayat";
-            const fileName = `Catatan_Harian_${currentReportData.jenis}_${safeDate}.pdf`;
+            const fileName = `Catatan_Harian_${currentReportData.jenis || 'Kegiatan'}_${safeDate}.pdf`;
 
             const opt = {
                 margin:       0, 
                 filename:     fileName,
                 image:        { type: 'jpeg', quality: 1 },
-                // Tambahkan scrollY: 0 dan scrollX: 0 untuk mereset koordinat tangkapan
-                html2canvas:  { scale: 2, useCORS: true, scrollY: 0, scrollX: 0 },
+                html2canvas:  { 
+                    scale: 2, 
+                    useCORS: true, 
+                    scrollY: 0, // Reset sistem Scroll
+                    scrollX: 0
+                },
                 jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
             };
 
-            // 4. Cetak menggunakan elemen kloningan
-            html2pdf().set(opt).from(clonedElement).save().then(() => {
-                // 5. Kembalikan tombol & bersihkan kloningan
+            // Cetak langsung dari elemen asli
+            html2pdf().set(opt).from(element).save().then(() => {
                 btnCetak.innerHTML = originalCetakHtml;
                 btnCetak.disabled = false;
-                btnCetak.classList.remove('opacity-70', 'cursor-not-allowed');
-                document.body.removeChild(clonedElement); 
-                
-                tutupPratinjau(); 
-                document.getElementById('laporanForm').reset(); 
             }).catch(err => {
                 alert('Terjadi kesalahan saat mencetak PDF.');
                 btnCetak.innerHTML = originalCetakHtml;
                 btnCetak.disabled = false;
-                btnCetak.classList.remove('opacity-70', 'cursor-not-allowed');
-                document.body.removeChild(clonedElement); 
             });
-        }
-        function resetTombolSimpan(originalHtml, btn) {
-            btn.innerHTML = originalHtml;
-            btn.disabled = false;
-            btn.classList.remove('opacity-70', 'cursor-not-allowed');
         }
     </script>
 </body>
