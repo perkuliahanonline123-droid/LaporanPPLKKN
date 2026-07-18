@@ -8,11 +8,9 @@
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    
     <!-- Fonts & Icons -->
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
     <!-- html2pdf.js for PDF Generation -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     
@@ -88,7 +86,7 @@
                     </div>
                 </div>
 
-                <!-- Baris 2: Kegiatan (Full Width) -->
+                <!-- Baris 2: Kegiatan -->
                 <div>
                     <label for="kegiatan" class="block mb-1.5 text-sm font-bold text-slate-700">Nama Kegiatan <span class="text-red-500">*</span></label>
                     <input type="text" id="kegiatan" required placeholder="Contoh: Kajian Keagamaan Rutin Jamaah..." class="bg-slate-50 border border-slate-200 text-slate-800 text-sm rounded-lg focus:ring-brand-500 focus:border-brand-500 block w-full p-2.5 outline-none transition-all">
@@ -106,93 +104,6 @@
                     </div>
                 </div>
 
-                <!-- Baris 4: Absensi -->
-                <div>
-                    <label class="block mb-2 text-sm font-bold text-slate-700">Peserta yang Mengikuti Kegiatan (Hilangkan centang jika absen) <span class="text-red-500">*</span></label>
-                    <div class="bg-slate-50 border border-slate-200 rounded-lg p-4 grid grid-cols-1 sm:grid-cols-2 gap-3 max-h-64 overflow-y-auto custom-scrollbar">
-                        <label class="flex items-center space-x-2.5 text-sm font-medium text-slate-700 cursor-pointer select-none">
-                            <input type="checkbox" name="pesertaAbsen" value="Naziel Majdi" checked class="w-4 h-4 text-brand-600 border-slate-300 rounded focus:ring-brand-500">
-                            <span>Naziel Majdi</span>
-                        </label>
-                        <label class="flex items-center space-x-2.5 text-sm font-medium text-slate-700 cursor-pointer select-none">
-                            <input type="checkbox" name="pesertaAbsen" value="Ulul Fadhli" checked class="w-4 h-4 text-brand-600 border-slate-300 rounded focus:ring-brand-500">
-                            <span>Ulul Fadhli</span>
-                        </label>
-                        <label class="flex items-center space-x-2.5 text-sm font-medium text-slate-700 cursor-pointer select-none">
-                            <input type="checkbox" name="pesertaAbsen" value="Ahmad Nafi`" checked class="w-4 h-4 text-brand-600 border-slate-300 rounded focus:ring-brand-500">
-                            <span>Ahmad Nafi`</span>
-                        </label>
-                        <label class="flex items-center space-x-2.5 text-sm font-medium text-slate-700 cursor-pointer select-none">
-                            <input type="checkbox" name="pesertaAbsen" value="Alaika Nikmatul Maula" checked class="w-4 h-4 text-brand-600 border-slate-300 rounded focus:ring-brand-500">
-                            <span>Alaika Nikmatul Maula</span>
-                        </label>
-                        <label class="flex items-center space-x-2.5 text-sm font-medium text-slate-700 cursor-pointer select-none">
-                            <input type="checkbox" name="pesertaAbsen" value="Buhori Muslim" checked class="w-4 h-4 text-brand-600 border-slate-300 rounded focus:ring-brand-500">
-                            <span>Buhori Muslim</span>
-                        </label>
-                        <label class="flex items-center space-x-2.5 text-sm font-medium text-slate-700 cursor-pointer select-none">
-                            <input type="checkbox" name="pesertaAbsen" value="Ilman Nafianur" checked class="w-4 h-4 text-brand-600 border-slate-300 rounded focus:ring-brand-500">
-                            <span>Ilman Nafianur</span>
-                        </label>
-                        <label class="flex items-center space-x-2.5 text-sm font-medium text-slate-700 cursor-pointer select-none">
-                            <input type="checkbox" name="pesertaAbsen" value="Moh Kholil" checked class="w-4 h-4 text-brand-600 border-slate-300 rounded focus:ring-brand-500">
-                            <span>Moh Kholil</span>
-                        </label>
-                        <label class="flex items-center space-x-2.5 text-sm font-medium text-slate-700 cursor-pointer select-none">
-                            <input type="checkbox" name="pesertaAbsen" value="Moh. Afton Sadat" checked class="w-4 h-4 text-brand-600 border-slate-300 rounded focus:ring-brand-500">
-                            <span>Moh. Afton Sadat</span>
-                        </label>
-                        <label class="flex items-center space-x-2.5 text-sm font-medium text-slate-700 cursor-pointer select-none">
-                            <input type="checkbox" name="pesertaAbsen" value="Mustafa Arbash" checked class="w-4 h-4 text-brand-600 border-slate-300 rounded focus:ring-brand-500">
-                            <span>Mustafa Arbash</span>
-                        </label>
-                        <label class="flex items-center space-x-2.5 text-sm font-medium text-slate-700 cursor-pointer select-none">
-                            <input type="checkbox" name="pesertaAbsen" value="Abdul Zaki" checked class="w-4 h-4 text-brand-600 border-slate-300 rounded focus:ring-brand-500">
-                            <span>Abdul Zaki</span>
-                        </label>
-                        <label class="flex items-center space-x-2.5 text-sm font-medium text-slate-700 cursor-pointer select-none">
-                            <input type="checkbox" name="pesertaAbsen" value="Abdullah Al Haqq" checked class="w-4 h-4 text-brand-600 border-slate-300 rounded focus:ring-brand-500">
-                            <span>Abdullah Al Haqq</span>
-                        </label>
-                        <label class="flex items-center space-x-2.5 text-sm font-medium text-slate-700 cursor-pointer select-none">
-                            <input type="checkbox" name="pesertaAbsen" value="Ahmad Faris" checked class="w-4 h-4 text-brand-600 border-slate-300 rounded focus:ring-brand-500">
-                            <span>Ahmad Faris</span>
-                        </label>
-                        <label class="flex items-center space-x-2.5 text-sm font-medium text-slate-700 cursor-pointer select-none">
-                            <input type="checkbox" name="pesertaAbsen" value="Ahmad Saifuddin Halim" checked class="w-4 h-4 text-brand-600 border-slate-300 rounded focus:ring-brand-500">
-                            <span>Ahmad Saifuddin Halim</span>
-                        </label>
-                        <label class="flex items-center space-x-2.5 text-sm font-medium text-slate-700 cursor-pointer select-none">
-                            <input type="checkbox" name="pesertaAbsen" value="Ian Mulyadin" checked class="w-4 h-4 text-brand-600 border-slate-300 rounded focus:ring-brand-500">
-                            <span>Ian Mulyadin</span>
-                        </label>
-                        <label class="flex items-center space-x-2.5 text-sm font-medium text-slate-700 cursor-pointer select-none">
-                            <input type="checkbox" name="pesertaAbsen" value="Mu`tasim Billah" checked class="w-4 h-4 text-brand-600 border-slate-300 rounded focus:ring-brand-500">
-                            <span>Mu`tasim Billah</span>
-                        </label>
-                        <label class="flex items-center space-x-2.5 text-sm font-medium text-slate-700 cursor-pointer select-none">
-                            <input type="checkbox" name="pesertaAbsen" value="Muhamad Fauzan" checked class="w-4 h-4 text-brand-600 border-slate-300 rounded focus:ring-brand-500">
-                            <span>Muhamad Fauzan</span>
-                        </label>
-                        <label class="flex items-center space-x-2.5 text-sm font-medium text-slate-700 cursor-pointer select-none">
-                            <input type="checkbox" name="pesertaAbsen" value="Muhammad" checked class="w-4 h-4 text-brand-600 border-slate-300 rounded focus:ring-brand-500">
-                            <span>Muhammad</span>
-                        </label>
-                        <label class="flex items-center space-x-2.5 text-sm font-medium text-slate-700 cursor-pointer select-none">
-                            <input type="checkbox" name="pesertaAbsen" value="Muhammad Fakhrur Royhan" checked class="w-4 h-4 text-brand-600 border-slate-300 rounded focus:ring-brand-500">
-                            <span>Muhammad Fakhrur Royhan</span>
-                        </label>
-                        <label class="flex items-center space-x-2.5 text-sm font-medium text-slate-700 cursor-pointer select-none">
-                            <input type="checkbox" name="pesertaAbsen" value="Rafli Arrasid" checked class="w-4 h-4 text-brand-600 border-slate-300 rounded focus:ring-brand-500">
-                            <span>Rafli Arrasid</span>
-                        </label>
-                        <label class="flex items-center space-x-2.5 text-sm font-medium text-slate-700 cursor-pointer select-none">
-                            <input type="checkbox" name="pesertaAbsen" value="Zawaidul Khoir" checked class="w-4 h-4 text-brand-600 border-slate-300 rounded focus:ring-brand-500">
-                            <span>Zawaidul Khoir</span>
-                        </label>
-                    </div>
-                </div>
-
                 <!-- Uraian -->
                 <div>
                     <label for="uraian" class="block mb-1.5 text-sm font-bold text-slate-700">Uraian Kegiatan <span class="text-red-500">*</span></label>
@@ -203,6 +114,30 @@
                 <div>
                     <label for="dpl" class="block mb-1.5 text-sm font-bold text-slate-700">Dosen Pembimbing Lapangan (DPL) <span class="text-red-500">*</span></label>
                     <input type="text" id="dpl" required placeholder="Contoh: Abdul Hakim, S.H., M.A." class="bg-slate-50 border border-slate-200 text-slate-800 text-sm rounded-lg focus:ring-brand-500 focus:border-brand-500 block w-full p-2.5 outline-none transition-all">
+                </div>
+
+                <!-- Baris Terakhir (Dipindah ke bawah): Absensi Otomatis -->
+                <div>
+                    <label class="block mb-2 text-sm font-bold text-slate-700">Peserta yang Mengikuti Kegiatan (Hilangkan centang jika absen) <span class="text-red-500">*</span></label>
+                    <div class="bg-slate-50 border border-slate-200 rounded-lg p-5 grid grid-cols-1 md:grid-cols-2 gap-6 max-h-72 overflow-y-auto custom-scrollbar">
+                        
+                        <!-- Kiri: Hukum Keluarga Islam -->
+                        <div>
+                            <h4 class="font-bold text-sm text-brand-800 border-b border-slate-200 pb-2 mb-3">Hukum Keluarga Islam</h4>
+                            <div id="list-hki" class="space-y-2.5">
+                                <p class="text-xs text-slate-400 animate-pulse">Menghubungkan ke database peserta...</p>
+                            </div>
+                        </div>
+
+                        <!-- Kanan: Pendidikan Bahasa Arab -->
+                        <div>
+                            <h4 class="font-bold text-sm text-brand-800 border-b border-slate-200 pb-2 mb-3">Pendidikan Bahasa Arab</h4>
+                            <div id="list-pba" class="space-y-2.5">
+                                <p class="text-xs text-slate-400 animate-pulse">Menghubungkan ke database peserta...</p>
+                            </div>
+                        </div>
+
+                    </div>
                 </div>
 
                 <div class="pt-4 mt-6 border-t border-slate-100 flex justify-end">
@@ -284,7 +219,7 @@
             <div class="p-6 md:p-10 bg-slate-200 flex justify-center overflow-x-auto custom-scrollbar">
                 <div class="shadow-2xl flex-shrink-0 bg-white">
                     
-                    <!-- AREA KERTAS A4 YANG AKAN DI-CLONE SAAT DICETAK -->
+                    <!-- AREA KERTAS A4 -->
                     <div id="pdf-template" style="width: 210mm; background: white; padding: 25mm 20mm; box-sizing: border-box; font-family: 'Times New Roman', Times, serif; color: #000; line-height: 1.5; text-align: left;">
                         <h2 style="font-size: 24px; font-weight: bold; margin-bottom: 40px; margin-top: 10px;">Catatan Kegiatan Harian <span id="pdf-title-jenis">PPL</span></h2>
                         <table style="width: 100%; margin-bottom: 30px; font-size: 16px; border-collapse: collapse; border: none;">
@@ -308,6 +243,7 @@
         </div>
     </div>
 
+    <!-- Logic Script -->
     <script>
         const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxg5RSTTOf6tUhle-7_ebhlW_3t2ekbqMO7DAYC7rs84qVImMIUBZJBeE3w8HVeVoL54A/exec';
         
@@ -329,7 +265,34 @@
             return `${d}/${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getFullYear()}`;
         }
 
-        document.addEventListener("DOMContentLoaded", () => muatRiwayat(false));
+        // Muat Riwayat & Peserta saat halaman dibuka
+        document.addEventListener("DOMContentLoaded", () => {
+            // Tampilkan cache peserta instan jika ada
+            const cachePeserta = localStorage.getItem('peserta_pplkkn_cache');
+            if(cachePeserta) {
+                try { renderPesertaOtomatis(JSON.parse(cachePeserta)); } catch(e){}
+            }
+            muatRiwayat(false);
+        });
+
+        // Merender Checkbox secara dinamis
+        function renderPesertaOtomatis(pesertaData) {
+            const listHKI = document.getElementById('list-hki');
+            const listPBA = document.getElementById('list-pba');
+
+            function buildCheckboxes(arr) {
+                if (!arr || arr.length === 0) return `<p class="text-xs text-slate-400 italic">Tidak ada data peserta</p>`;
+                return arr.map(name => `
+                    <label class="flex items-start space-x-2.5 text-sm font-medium text-slate-700 cursor-pointer select-none group">
+                        <input type="checkbox" name="pesertaAbsen" value="${name}" checked class="mt-0.5 w-4 h-4 text-brand-600 border-slate-300 rounded focus:ring-brand-500 shrink-0 transition-colors">
+                        <span class="leading-tight group-hover:text-brand-800 transition-colors">${name}</span>
+                    </label>
+                `).join('');
+            }
+
+            listHKI.innerHTML = buildCheckboxes(pesertaData.hki);
+            listPBA.innerHTML = buildCheckboxes(pesertaData.pba);
+        }
 
         function muatRiwayat(forceRefresh = false) {
             const loading = document.getElementById('loadingHistory');
@@ -346,7 +309,7 @@
                     table.classList.remove('hidden');
                     loading.classList.add('hidden');
                 } catch(e) {
-                    console.log("Cache rusak, memuat ulang...");
+                    console.log("Cache rusak...");
                 }
             } else {
                 loading.classList.remove('hidden');
@@ -357,6 +320,12 @@
             fetch(SCRIPT_URL)
             .then(res => res.json())
             .then(data => {
+                // Render List Peserta jika ditarik dari server
+                if(data.peserta) {
+                    renderPesertaOtomatis(data.peserta);
+                    localStorage.setItem('peserta_pplkkn_cache', JSON.stringify(data.peserta));
+                }
+
                 if(data.status === "sukses" && data.data.length > 0) {
                     riwayatCache = data.data; 
                     localStorage.setItem('riwayat_laporan_pplkkn', JSON.stringify(data.data));
@@ -412,10 +381,7 @@
             const data = riwayatCache[index];
             if (!data) return;
 
-            currentReportData = { 
-                jenis: data.jenis, 
-                tanggalInput: data.tanggal 
-            };
+            currentReportData = { jenis: data.jenis, tanggalInput: data.tanggal };
 
             document.getElementById('pdf-title-jenis').innerText = data.jenis;
             document.getElementById('pdf-hari').innerText = data.hariIndo || formatTanggalIndo(data.tanggal);
@@ -474,7 +440,7 @@
             formData.append('uraian', uraian);
             formData.append('dpl', dpl);
             formData.append('hariBulanTahun', tanggalFormatted);
-            formData.append('absen', daftarAbsen);
+            formData.append('absen', daftarAbsen); 
 
             fetch(SCRIPT_URL, {
                 method: 'POST',
@@ -515,8 +481,6 @@
             btnCetak.disabled = true;
             btnCetak.classList.add('opacity-70', 'cursor-not-allowed');
 
-            // --- TRIK ISOLASI CLONE ---
-            // Pemecahan masalah "menciut ke tengah" dan "kepotong" saat scroll aktif
             const element = document.getElementById('pdf-template');
             const clone = element.cloneNode(true);
             
@@ -524,8 +488,8 @@
             wrapper.style.position = 'absolute';
             wrapper.style.top = '0';
             wrapper.style.left = '0';
-            wrapper.style.width = '210mm'; // Lebar pasti A4
-            wrapper.style.zIndex = '1';    // Disembunyikan di balik latar gelap modal (z-index modal = 50)
+            wrapper.style.width = '210mm'; 
+            wrapper.style.zIndex = '1';    
             
             wrapper.appendChild(clone);
             document.body.appendChild(wrapper);
@@ -540,14 +504,14 @@
                 html2canvas:  { 
                     scale: 2, 
                     useCORS: true,
-                    scrollY: 0, // Kunci utama untuk mencegah ruang kosong di atas PDF
+                    scrollY: 0, 
                     scrollX: 0
                 },
                 jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
             };
 
             html2pdf().set(opt).from(clone).save().then(() => {
-                document.body.removeChild(wrapper); // Bersihkan sisa kloningan
+                document.body.removeChild(wrapper); 
                 
                 btnCetak.innerHTML = originalCetakHtml;
                 btnCetak.disabled = false;
