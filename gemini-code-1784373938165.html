@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#7f1d1d">
+    <title>Generator Laporan Harian PPL & KKN</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Fonts & Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- html2pdf.js for PDF Generation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Outfit', 'sans-serif'], serif: ['Playfair Display', 'serif'] },
+                    colors: { 
+                        brand: { 950: '#450a0a', 900: '#7f1d1d', 800: '#991b1b', 700: '#b91c1c', 600: '#dc2626', 500: '#ef4444', 100: '#fee2e2', 50: '#fef2f2' } 
+                    },
+                    boxShadow: {
+                        'timbul': '0 20px 40px -15px rgba(69, 10, 10, 0.12), 0 15px 30px -20px rgba(220, 38, 38, 0.15), inset 0 1px 0 rgba(255,255,255,0.6)',
+                        'timbul-lg': '0 30px 60px -15px rgba(69, 10, 10, 0.2), 0 25px 45px -20px rgba(220, 38, 38, 0.25)',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { background-color: #F8FAFC; -webkit-tap-highlight-color: transparent; }
+        .bg-mesh { background-color: #7f1d1d; background-image: radial-gradient(at 0% 0%, #991b1b 0px, transparent 50%), radial-gradient(at 100% 100%, #b91c1c 0px, transparent 50%); }
+        html { scroll-behavior: smooth; }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: translateY(0); } }
+        .animate-slide-up { animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        
+        /* Custom Scrollbar */
+        .custom-scrollbar::-webkit-scrollbar { height: 6px; width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 10px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+        /* Hidden PDF Template Container */
+        #pdf-export-container {
+            position: absolute;
+            top: -9999px;
+            left: -9999px;
+            z-index: -1;
+        }
+    </style>
+</head>
+<body class="flex flex-col min-h-screen text-slate-800 font-sans antialiased">
+
+    <!-- Header Section -->
+    <header class="w-full bg-mesh text-white px-6 md:px-10 pt-12 md:pt-14 pb-20 md:pb-24 rounded-b-[2rem] md:rounded-b-[2.5rem] shadow-timbul-lg relative overflow-hidden animate-slide-up z-10">
+        <div class="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full blur-3xl -mr-20 -mt-20 pointer-events-none"></div>
+        
+        <div class="relative z-10 flex flex-col items-start text-left max-w-7xl mx-auto w-full">
+            <span class="text-[10px] md:text-xs font-bold tracking-widest text-brand-100 uppercase mb-3 inline-block px-4 py-1.5 bg-white/10 backdrop-blur-md rounded-full border border-white/10">Sistem Pelaporan</span>
+            <h1 class="font-serif text-3xl md:text-4xl lg:text-5xl font-bold leading-tight">Laporan Harian PPL & KKN</h1>
+            <p class="text-brand-100/90 text-sm md:text-base mt-2 md:mt-3 max-w-2xl font-normal">Isi formulir di bawah ini untuk menghasilkan dokumen catatan kegiatan harian secara otomatis dalam format PDF yang rapi.</p>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="w-full max-w-4xl mx-auto px-4 md:px-8 -mt-14 md:-mt-16 relative z-20 space-y-6 pb-12 flex-1">
+        
+        <!-- Form Container -->
+        <div class="bg-white rounded-[1.5rem] md:rounded-[2rem] shadow-sm border border-slate-200 p-6 md:p-10 w-full animate-slide-up">
+            
+            <div class="flex items-center gap-3 mb-8 pb-4 border-b border-slate-100">
+                <div class="w-10 h-10 bg-brand-50 text-brand-600 rounded-xl flex items-center justify-center shadow-inner shrink-0">
+                    <i class="fas fa-edit text-lg"></i>
+                </div>
+                <div>
+                    <h2 class="font-extrabold text-xl text-slate-800 leading-none">Formulir Kegiatan</h2>
+                    <p class="text-xs font-medium text-slate-500 mt-1">Lengkapi data dengan benar sebelum mengunduh PDF</p>
+                </div>
+            </div>
+
+            <form id="laporanForm" onsubmit="generatePDF(event)" class="space-y-5">
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                    <!-- Jenis Laporan -->
+                    <div>
+                        <label for="jenisLaporan" class="block mb-1.5 text-sm font-bold text-slate-700">Jenis Laporan <span class="text-red-500">*</span></label>
+                        <select id="jenisLaporan" required class="bg-slate-50 border border-slate-200 text-slate-800 text-sm rounded-lg focus:ring-brand-500 focus:border-brand-500 block w-full p-2.5 outline-none transition-all">
+                            <option value="" disabled selected>Pilih jenis kegiatan...</option>
+                            <option value="PPL">PPL</option>
+                            <option value="KKN">KKN</option>
+                        </select>
+                    </div>
+
+                    <!-- Tanggal Kegiatan -->
+                    <div>
+                        <label for="tanggal" class="block mb-1.5 text-sm font-bold text-slate-700">Tanggal Kegiatan <span class="text-red-500">*</span></label>
+                        <input type="date" id="tanggal" required class="bg-slate-50 border border-slate-200 text-slate-800 text-sm rounded-lg focus:ring-brand-500 focus:border-brand-500 block w-full p-2.5 outline-none transition-all">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                    <!-- Program -->
+                    <div>
+                        <label for="program" class="block mb-1.5 text-sm font-bold text-slate-700">Program <span class="text-red-500">*</span></label>
+                        <input type="text" id="program" required placeholder="Contoh: Peningkatan Pemahaman Keagamaan..." class="bg-slate-50 border border-slate-200 text-slate-800 text-sm rounded-lg focus:ring-brand-500 focus:border-brand-500 block w-full p-2.5 outline-none transition-all">
+                    </div>
+
+                    <!-- Kegiatan -->
+                    <div>
+                        <label for="kegiatan" class="block mb-1.5 text-sm font-bold text-slate-700">Kegiatan <span class="text-red-500">*</span></label>
+                        <input type="text" id="kegiatan" required placeholder="Contoh: Kajian Keagamaan Rutin di Masjid..." class="bg-slate-50 border border-slate-200 text-slate-800 text-sm rounded-lg focus:ring-brand-500 focus:border-brand-500 block w-full p-2.5 outline-none transition-all">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                    <!-- Tempat -->
+                    <div>
+                        <label for="tempat" class="block mb-1.5 text-sm font-bold text-slate-700">Tempat <span class="text-red-500">*</span></label>
+                        <input type="text" id="tempat" required placeholder="Contoh: Masjid Al-Ikhlas" class="bg-slate-50 border border-slate-200 text-slate-800 text-sm rounded-lg focus:ring-brand-500 focus:border-brand-500 block w-full p-2.5 outline-none transition-all">
+                    </div>
+
+                    <!-- Mitra -->
+                    <div>
+                        <label for="mitra" class="block mb-1.5 text-sm font-bold text-slate-700">Mitra <span class="text-red-500">*</span></label>
+                        <input type="text" id="mitra" required placeholder="Contoh: Majelis Taklim Al-Hikmah..." class="bg-slate-50 border border-slate-200 text-slate-800 text-sm rounded-lg focus:ring-brand-500 focus:border-brand-500 block w-full p-2.5 outline-none transition-all">
+                    </div>
+                </div>
+
+                <!-- Uraian Kegiatan -->
+                <div>
+                    <label for="uraian" class="block mb-1.5 text-sm font-bold text-slate-700">Uraian Kegiatan <span class="text-red-500">*</span></label>
+                    <textarea id="uraian" required rows="5" placeholder="Ceritakan detail kegiatan secara naratif (paragraf)..." class="bg-slate-50 border border-slate-200 text-slate-800 text-sm rounded-lg focus:ring-brand-500 focus:border-brand-500 block w-full p-2.5 outline-none transition-all custom-scrollbar"></textarea>
+                </div>
+
+                <!-- DPL -->
+                <div>
+                    <label for="dpl" class="block mb-1.5 text-sm font-bold text-slate-700">Dosen Pembimbing Lapangan (DPL) <span class="text-red-500">*</span></label>
+                    <input type="text" id="dpl" required placeholder="Contoh: Abdul Hakim, S.H., M.A." class="bg-slate-50 border border-slate-200 text-slate-800 text-sm rounded-lg focus:ring-brand-500 focus:border-brand-500 block w-full p-2.5 outline-none transition-all">
+                </div>
+
+                <!-- Submit Button -->
+                <div class="pt-4 mt-6 border-t border-slate-100 flex justify-end">
+                    <button type="submit" id="btn-download" class="text-white bg-brand-700 hover:bg-brand-800 focus:ring-4 focus:ring-brand-100 font-bold rounded-xl text-sm px-6 py-3 transition-all flex items-center gap-2 shadow-sm">
+                        <i class="fas fa-file-pdf"></i> Unduh Laporan PDF
+                    </button>
+                </div>
+            </form>
+        </div>
+    </main>
+
+    <footer class="w-full text-center py-6 text-slate-400 text-xs font-semibold tracking-wider mt-auto bg-transparent z-10">
+        &copy; 2026 Layanan Administrasi Akademik
+    </footer>
+
+    <!-- ========================================== -->
+    <!-- HIDDEN PDF TEMPLATE (Strictly formatted) -->
+    <!-- ========================================== -->
+    <div id="pdf-export-container">
+        <!-- The container width is fixed to 750px to simulate A4 scaling well with html2pdf -->
+        <div id="pdf-template" style="padding: 20px; font-family: 'Times New Roman', Times, serif; color: #000; background: #fff; width: 750px; line-height: 1.5;">
+            
+            <h2 style="font-size: 24px; font-weight: bold; margin-bottom: 40px; margin-top: 10px;">Catatan Kegiatan Harian <span id="pdf-title-jenis">PPL</span></h2>
+            
+            <table style="width: 100%; margin-bottom: 40px; font-size: 16px; border-collapse: collapse;">
+                <tr>
+                    <td style="width: 160px; font-weight: bold; vertical-align: top; padding-bottom: 15px;">Hari</td>
+                    <td style="width: 25px; vertical-align: top; padding-bottom: 15px;">:</td>
+                    <td id="pdf-hari" style="vertical-align: top; padding-bottom: 15px;"></td>
+                </tr>
+                <tr>
+                    <td style="font-weight: bold; vertical-align: top; padding-bottom: 15px;">Program</td>
+                    <td style="vertical-align: top; padding-bottom: 15px;">:</td>
+                    <td id="pdf-program" style="vertical-align: top; padding-bottom: 15px; line-height: 1.6;"></td>
+                </tr>
+                <tr>
+                    <td style="font-weight: bold; vertical-align: top; padding-bottom: 15px;">Kegiatan</td>
+                    <td style="vertical-align: top; padding-bottom: 15px;">:</td>
+                    <td id="pdf-kegiatan" style="vertical-align: top; padding-bottom: 15px; line-height: 1.6;"></td>
+                </tr>
+                <tr>
+                    <td style="font-weight: bold; vertical-align: top; padding-bottom: 15px;">Tempat</td>
+                    <td style="vertical-align: top; padding-bottom: 15px;">:</td>
+                    <td id="pdf-tempat" style="vertical-align: top; padding-bottom: 15px; line-height: 1.6;"></td>
+                </tr>
+                <tr>
+                    <td style="font-weight: bold; vertical-align: top; padding-bottom: 15px;">Mitra</td>
+                    <td style="vertical-align: top; padding-bottom: 15px;">:</td>
+                    <td id="pdf-mitra" style="vertical-align: top; padding-bottom: 15px; line-height: 1.6;"></td>
+                </tr>
+            </table>
+
+            <h3 style="text-align: center; font-size: 20px; font-weight: bold; margin-bottom: 25px;">Uraian Kegiatan</h3>
+            
+            <!-- White-space pre-wrap allows multiple paragraphs if user presses enter -->
+            <p id="pdf-uraian" style="text-align: justify; font-size: 16px; line-height: 1.8; text-indent: 48px; white-space: pre-wrap; margin-bottom: 60px;"></p>
+
+            <div style="margin-top: 60px; text-align: center; width: 350px; margin-left: auto; margin-right: auto;">
+                <p style="margin: 0; font-size: 16px; line-height: 1.5;">Mengetahui</p>
+                <p style="margin: 0; font-size: 16px; line-height: 1.5;">Dosen Pembimbing Lapangan,</p>
+                <br><br><br><br>
+                <u id="pdf-dpl" style="font-weight: bold; font-size: 16px;"></u>
+            </div>
+        </div>
+    </div>
+
+    <!-- Script for Logic and PDF Generation -->
+    <script>
+        // URL Google Apps Script yang disinkronkan
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxg5RSTTOf6tUhle-7_ebhlW_3t2ekbqMO7DAYC7rs84qVImMIUBZJBeE3w8HVeVoL54A/exec';
+
+        // Formatter Tanggal (Ubah YYYY-MM-DD ke "Rabu, 19 Maret 2025")
+        function formatTanggalIndo(dateString) {
+            if (!dateString) return "";
+            const date = new Date(dateString);
+            const days = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+            const months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+            
+            const dayName = days[date.getDay()];
+            const day = date.getDate();
+            const month = months[date.getMonth()];
+            const year = date.getFullYear();
+            
+            return `${dayName}, ${day} ${month} ${year}`;
+        }
+
+        // Logic Submit dan Ekspor PDF
+        function generatePDF(e) {
+            e.preventDefault();
+
+            // 1. Ambil Nilai dari Form
+            const jenis = document.getElementById('jenisLaporan').value;
+            const tanggalInput = document.getElementById('tanggal').value;
+            const program = document.getElementById('program').value;
+            const kegiatan = document.getElementById('kegiatan').value;
+            const tempat = document.getElementById('tempat').value;
+            const mitra = document.getElementById('mitra').value;
+            const uraian = document.getElementById('uraian').value;
+            const dpl = document.getElementById('dpl').value;
+
+            // 2. Format Tanggal
+            const tanggalFormatted = formatTanggalIndo(tanggalInput);
+
+            // 3. Masukkan ke dalam Hidden Template PDF
+            document.getElementById('pdf-title-jenis').innerText = jenis;
+            document.getElementById('pdf-hari').innerText = tanggalFormatted;
+            document.getElementById('pdf-program').innerText = program;
+            document.getElementById('pdf-kegiatan').innerText = kegiatan;
+            document.getElementById('pdf-tempat').innerText = tempat;
+            document.getElementById('pdf-mitra').innerText = mitra;
+            document.getElementById('pdf-uraian').innerText = uraian;
+            document.getElementById('pdf-dpl').innerText = dpl;
+
+            // 4. Ubah state tombol menjadi loading
+            const btn = document.getElementById('btn-download');
+            const originalBtnHtml = btn.innerHTML;
+            btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Menyimpan & Menyusun PDF...`;
+            btn.disabled = true;
+            btn.classList.add('opacity-70', 'cursor-not-allowed');
+
+            // 5. Susun Objek Data untuk dikirim ke Google Sheets (Sesuai parameter GS)
+            const dataSheet = {
+                jenisLaporan: jenis,
+                tanggalFormatted: tanggalInput, 
+                program: program,
+                kegiatan: kegiatan,
+                tempat: tempat,
+                mitra: mitra,
+                uraian: uraian,
+                dpl: dpl,
+                hariBulanTahun: tanggalFormatted
+            };
+
+            // 6. Kirim data ke Google Sheets menggunakan URL (Fetch API)
+            fetch(SCRIPT_URL, {
+                method: 'POST',
+                redirect: 'follow', // Penting untuk Google Apps Script
+                headers: {
+                    // Gunakan text/plain untuk menghindari error CORS preflight di browser
+                    'Content-Type': 'text/plain;charset=utf-8', 
+                },
+                body: JSON.stringify(dataSheet)
+            })
+            .then(response => response.json())
+            .then(response => {
+                if (response.status === "sukses") {
+                    // Jika berhasil disimpan, lanjutkan unduh PDF
+                    eksekusiUnduhPDF(jenis, tanggalInput, originalBtnHtml, btn);
+                } else {
+                    alert("Gagal menyimpan data ke Spreadsheet: " + response.pesan);
+                    resetTombol(originalBtnHtml, btn);
+                }
+            })
+            .catch(error => {
+                alert("Koneksi ke server gagal! Periksa koneksi internet Anda.");
+                resetTombol(originalBtnHtml, btn);
+                console.error(error);
+            });
+        }
+
+        // Fungsi bantuan untuk mengeksekusi PDF setelah data masuk Sheets
+        function eksekusiUnduhPDF(jenis, tanggalInput, originalBtnHtml, btn) {
+            const element = document.getElementById('pdf-template');
+            const safeDate = tanggalInput.replace(/-/g, "");
+            const fileName = `Catatan_Harian_${jenis}_${safeDate}.pdf`;
+
+            const opt = {
+                margin:       [1, 1, 1, 1],
+                filename:     fileName,
+                image:        { type: 'jpeg', quality: 0.98 },
+                html2canvas:  { scale: 2, useCORS: true },
+                jsPDF:        { unit: 'in', format: 'a4', orientation: 'portrait' }
+            };
+
+            html2pdf().set(opt).from(element).save().then(() => {
+                resetTombol(originalBtnHtml, btn);
+                alert("Data berhasil disimpan ke Sheet dan PDF telah diunduh!");
+                // Opsional: document.getElementById('laporanForm').reset();
+            }).catch(err => {
+                alert('Terjadi kesalahan saat memproses PDF.');
+                resetTombol(originalBtnHtml, btn);
+            });
+        }
+
+        function resetTombol(originalHtml, btn) {
+            btn.innerHTML = originalHtml;
+            btn.disabled = false;
+            btn.classList.remove('opacity-70', 'cursor-not-allowed');
+        }
+    </script>
+</body>
+</html>
