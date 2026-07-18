@@ -313,17 +313,20 @@
         let currentReportData = {};
         let riwayatCache = []; 
 
-        // FIX 1: Format Tanggal Menggunakan Timezone Lokal (WIB)
+        // FIX 1: Memaksa pengubahan tanggal menjadi format Indonesia dengan aman
         function formatTanggalIndo(dateString) {
             if (!dateString) return "-";
-            
-            // Biarkan object Date yang mengonversi '2026-07-17T17:00:00.000Z' menjadi waktu lokal (18 Juli)
-            const date = new Date(dateString);
-            if (isNaN(date.getTime())) return dateString; 
+            try {
+                const date = new Date(dateString);
+                if (isNaN(date.getTime())) return dateString; 
 
-            const days = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
-            const months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
-            return `${days[date.getDay()]}, ${date.getDate()} ${months[date.getMonth()]} ${date.getFullYear()}`;
+                const days = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+                const months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+                
+                return `${days[date.getDay()]}, ${date.getDate()} ${months[date.getMonth()]} ${date.getFullYear()}`;
+            } catch (e) {
+                return dateString;
+            }
         }
 
         function formatShortDate(dateString) {
@@ -336,7 +339,6 @@
             return `${d}/${m}/${date.getFullYear()}`;
         }
 
-        // Muat Riwayat saat halaman dibuka
         document.addEventListener("DOMContentLoaded", () => muatRiwayat(false));
 
         function muatRiwayat(forceRefresh = false) {
@@ -394,7 +396,7 @@
             let html = '';
             
             dataList.forEach((item, index) => {
-                let badgeClass = item.jenis.toUpperCase() === 'KKN' ? 'bg-orange-100 text-orange-700 border-orange-200' : 'bg-blue-100 text-blue-700 border-blue-200';
+                let badgeClass = item.jenis && item.jenis.toUpperCase() === 'KKN' ? 'bg-orange-100 text-orange-700 border-orange-200' : 'bg-blue-100 text-blue-700 border-blue-200';
                 let displayDate = String(item.tanggal).includes("T") ? formatShortDate(item.tanggal) : item.tanggal;
 
                 html += `
@@ -416,7 +418,6 @@
             tbody.innerHTML = html;
         }
 
-        // Lengkapi fungsi yang terpotong
         function bukaPratinjauDariRiwayat(index) {
             const data = riwayatCache[index];
             if (!data) return;
@@ -426,20 +427,22 @@
                 tanggalInput: data.tanggal 
             };
 
-            document.getElementById('pdf-title-jenis').innerText = data.jenis;
-            document.getElementById('pdf-hari').innerText = data.hariIndo || formatTanggalIndo(data.tanggal);
-            document.getElementById('pdf-kegiatan').innerText = data.kegiatan;
-            document.getElementById('pdf-tempat').innerText = data.tempat;
-            document.getElementById('pdf-mitra').innerText = data.mitra;
-            document.getElementById('pdf-uraian').innerText = data.uraian;
+            document.getElementById('pdf-title-jenis').innerText = data.jenis || '-';
             
-            // Format array peserta jika bentuknya array, atau gunakan string bawaan
-            let absenStr = data.pesertaAbsen || '-';
-            if (Array.isArray(data.pesertaAbsen)) absenStr = data.pesertaAbsen.join(', ');
+            // FIX 1 Diterapkan: Paksa pemrosesan tanggal, abaikan data mentah
+            document.getElementById('pdf-hari').innerText = formatTanggalIndo(data.tanggal);
+            
+            document.getElementById('pdf-kegiatan').innerText = data.kegiatan || '-';
+            document.getElementById('pdf-tempat').innerText = data.tempat || '-';
+            document.getElementById('pdf-mitra').innerText = data.mitra || '-';
+            document.getElementById('pdf-uraian').innerText = data.uraian || '-';
+            
+            // FIX 2 Diterapkan: Menangkap berbagai nama variabel (kolom) untuk peserta hadir
+            let absenStr = data.pesertaAbsen || data.peserta || data.peserta_hadir || data.pesertahadir || data.mahasiswa || '-';
+            if (Array.isArray(absenStr)) absenStr = absenStr.join(', ');
             document.getElementById('pdf-absen').innerText = absenStr;
             
-            // Ini bagian yang terpotong di kode Anda
-            document.getElementById('pdf-dpl').innerText = data.dpl; 
+            document.getElementById('pdf-dpl').innerText = data.dpl || '-'; 
             
             document.getElementById('preview-modal').classList.remove('hidden');
         }
@@ -455,7 +458,6 @@
             const uraian = document.getElementById('uraian').value;
             const dpl = document.getElementById('dpl').value;
 
-            // Kumpulkan peserta yang dicentang
             const checkboxes = document.querySelectorAll('input[name="pesertaAbsen"]:checked');
             const peserta = Array.from(checkboxes).map(cb => cb.value).join(', ');
 
@@ -466,7 +468,7 @@
             document.getElementById('pdf-kegiatan').innerText = kegiatan;
             document.getElementById('pdf-tempat').innerText = tempat;
             document.getElementById('pdf-mitra').innerText = mitra;
-            document.getElementById('pdf-absen').innerText = peserta;
+            document.getElementById('pdf-absen').innerText = peserta || '-';
             document.getElementById('pdf-uraian').innerText = uraian;
             document.getElementById('pdf-dpl').innerText = dpl;
 
@@ -477,36 +479,44 @@
             document.getElementById('preview-modal').classList.add('hidden');
         }
 
-        // FIX 2: Cetak PDF Tanpa Clone, Resolusi Aman dari Terpotong / Blank
         function cetakPDF() {
             const btnCetak = document.getElementById('btn-cetak');
             const originalCetakHtml = btnCetak.innerHTML;
             btnCetak.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Menyusun...`;
             btnCetak.disabled = true;
 
-            // KUNCI UTAMA: Scroll Modal Pop-up ke posisi paling atas sebelum di-capture
             const modal = document.getElementById('preview-modal');
             modal.scrollTo(0, 0);
 
             const element = document.getElementById('pdf-template');
+            
+            // FIX 3 Diterapkan: Memaksa elemen memiliki rasio lebar A4 (794px) agar PDF proporsional
+            const originalWidth = element.style.width;
+            const originalMaxWidth = element.style.maxWidth;
+            element.style.width = '794px';
+            element.style.maxWidth = '794px';
+
             const safeDate = currentReportData.tanggalInput ? currentReportData.tanggalInput.substring(0,10).replace(/-/g, "") : "Riwayat";
             const fileName = `Catatan_Harian_${currentReportData.jenis || 'Kegiatan'}_${safeDate}.pdf`;
 
             const opt = {
-                margin:       0, 
+                margin:       15, // Memberikan margin tepi kertas sebesar 15mm agar rapi
                 filename:     fileName,
                 image:        { type: 'jpeg', quality: 1 },
                 html2canvas:  { 
                     scale: 2, 
                     useCORS: true, 
-                    scrollY: 0, // Reset sistem Scroll
-                    scrollX: 0
+                    scrollY: 0,
+                    windowWidth: 794 // Sinkronisasi kanvas dengan rasio lebar A4
                 },
                 jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
             };
 
-            // Cetak langsung dari elemen asli
             html2pdf().set(opt).from(element).save().then(() => {
+                // Kembalikan style elemen ke bentuk aslinya (responsif)
+                element.style.width = originalWidth;
+                element.style.maxWidth = originalMaxWidth;
+                
                 btnCetak.innerHTML = originalCetakHtml;
                 btnCetak.disabled = false;
             }).catch(err => {
