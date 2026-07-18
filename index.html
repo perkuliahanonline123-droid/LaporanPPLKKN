@@ -173,50 +173,54 @@
             <!-- Area Kertas A4 (Container untuk html2pdf) -->
             <div class="p-6 md:p-10 bg-slate-200 flex justify-center overflow-x-auto custom-scrollbar">
                 
-                <div id="pdf-template" style="width: 794px; background: white; padding: 60px; min-height: 1123px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); font-family: 'Times New Roman', Times, serif; color: #000; line-height: 1.5;">
+                <!-- Wrapper Pembatas: Memastikan bayangan kotak tidak ikut tercetak -->
+                <div class="shadow-2xl flex-shrink-0 bg-white">
                     
-                    <h2 style="font-size: 24px; font-weight: bold; margin-bottom: 40px; margin-top: 10px;">Catatan Kegiatan Harian <span id="pdf-title-jenis">PPL</span></h2>
-                    
-                    <table style="width: 100%; margin-bottom: 40px; font-size: 16px; border-collapse: collapse;">
-                        <tr>
-                            <td style="width: 160px; font-weight: bold; vertical-align: top; padding-bottom: 15px;">Hari</td>
-                            <td style="width: 25px; vertical-align: top; padding-bottom: 15px;">:</td>
-                            <td id="pdf-hari" style="vertical-align: top; padding-bottom: 15px;"></td>
-                        </tr>
-                        <tr>
-                            <td style="font-weight: bold; vertical-align: top; padding-bottom: 15px;">Program</td>
-                            <td style="vertical-align: top; padding-bottom: 15px;">:</td>
-                            <td id="pdf-program" style="vertical-align: top; padding-bottom: 15px; line-height: 1.6;"></td>
-                        </tr>
-                        <tr>
-                            <td style="font-weight: bold; vertical-align: top; padding-bottom: 15px;">Kegiatan</td>
-                            <td style="vertical-align: top; padding-bottom: 15px;">:</td>
-                            <td id="pdf-kegiatan" style="vertical-align: top; padding-bottom: 15px; line-height: 1.6;"></td>
-                        </tr>
-                        <tr>
-                            <td style="font-weight: bold; vertical-align: top; padding-bottom: 15px;">Tempat</td>
-                            <td style="vertical-align: top; padding-bottom: 15px;">:</td>
-                            <td id="pdf-tempat" style="vertical-align: top; padding-bottom: 15px; line-height: 1.6;"></td>
-                        </tr>
-                        <tr>
-                            <td style="font-weight: bold; vertical-align: top; padding-bottom: 15px;">Mitra</td>
-                            <td style="vertical-align: top; padding-bottom: 15px;">:</td>
-                            <td id="pdf-mitra" style="vertical-align: top; padding-bottom: 15px; line-height: 1.6;"></td>
-                        </tr>
-                    </table>
+                    <!-- ID ini yang akan di-capture oleh html2pdf. Ukuran lebar mutlak 210mm (A4) -->
+                    <div id="pdf-template" style="width: 210mm; background: white; padding: 25mm 20mm; box-sizing: border-box; font-family: 'Times New Roman', Times, serif; color: #000; line-height: 1.5; text-align: left;">
+                        
+                        <h2 style="font-size: 24px; font-weight: bold; margin-bottom: 40px; margin-top: 10px;">Catatan Kegiatan Harian <span id="pdf-title-jenis">PPL</span></h2>
+                        
+                        <table style="width: 100%; margin-bottom: 40px; font-size: 16px; border-collapse: collapse; border: none;">
+                            <tr>
+                                <td style="width: 160px; font-weight: bold; vertical-align: top; padding-bottom: 15px;">Hari</td>
+                                <td style="width: 25px; vertical-align: top; padding-bottom: 15px;">:</td>
+                                <td id="pdf-hari" style="vertical-align: top; padding-bottom: 15px;"></td>
+                            </tr>
+                            <tr>
+                                <td style="font-weight: bold; vertical-align: top; padding-bottom: 15px;">Program</td>
+                                <td style="vertical-align: top; padding-bottom: 15px;">:</td>
+                                <td id="pdf-program" style="vertical-align: top; padding-bottom: 15px; line-height: 1.6;"></td>
+                            </tr>
+                            <tr>
+                                <td style="font-weight: bold; vertical-align: top; padding-bottom: 15px;">Kegiatan</td>
+                                <td style="vertical-align: top; padding-bottom: 15px;">:</td>
+                                <td id="pdf-kegiatan" style="vertical-align: top; padding-bottom: 15px; line-height: 1.6;"></td>
+                            </tr>
+                            <tr>
+                                <td style="font-weight: bold; vertical-align: top; padding-bottom: 15px;">Tempat</td>
+                                <td style="vertical-align: top; padding-bottom: 15px;">:</td>
+                                <td id="pdf-tempat" style="vertical-align: top; padding-bottom: 15px; line-height: 1.6;"></td>
+                            </tr>
+                            <tr>
+                                <td style="font-weight: bold; vertical-align: top; padding-bottom: 15px;">Mitra</td>
+                                <td style="vertical-align: top; padding-bottom: 15px;">:</td>
+                                <td id="pdf-mitra" style="vertical-align: top; padding-bottom: 15px; line-height: 1.6;"></td>
+                            </tr>
+                        </table>
 
-                    <h3 style="text-align: center; font-size: 20px; font-weight: bold; margin-bottom: 25px;">Uraian Kegiatan</h3>
-                    
-                    <p id="pdf-uraian" style="text-align: justify; font-size: 16px; line-height: 1.8; text-indent: 48px; white-space: pre-wrap; margin-bottom: 80px;"></p>
+                        <h3 style="text-align: center; font-size: 20px; font-weight: bold; margin-bottom: 25px;">Uraian Kegiatan</h3>
+                        
+                        <p id="pdf-uraian" style="text-align: justify; font-size: 16px; line-height: 1.8; text-indent: 48px; white-space: pre-wrap; margin-bottom: 80px;"></p>
 
-                    <!-- Blok Tanda Tangan (Sesuai Gambar Target) -->
-                    <div style="margin-top: 60px; text-align: center; width: 350px; margin-left: auto; margin-right: auto;">
-                        <p style="margin: 0; font-size: 16px; line-height: 1.5;">Mengetahui</p>
-                        <p style="margin: 0; font-size: 16px; line-height: 1.5;">Dosen Pembimbing Lapangan,</p>
-                        <br><br><br><br>
-                        <u id="pdf-dpl" style="font-weight: bold; font-size: 16px;"></u>
+                        <div style="margin-top: 60px; text-align: center; width: 350px; margin-left: auto; margin-right: auto;">
+                            <p style="margin: 0; font-size: 16px; line-height: 1.5;">Mengetahui</p>
+                            <p style="margin: 0; font-size: 16px; line-height: 1.5;">Dosen Pembimbing Lapangan,</p>
+                            <br><br><br><br>
+                            <u id="pdf-dpl" style="font-weight: bold; font-size: 16px;"></u>
+                        </div>
+
                     </div>
-
                 </div>
 
             </div>
@@ -227,7 +231,6 @@
     <script>
         const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxg5RSTTOf6tUhle-7_ebhlW_3t2ekbqMO7DAYC7rs84qVImMIUBZJBeE3w8HVeVoL54A/exec';
         
-        // Simpan referensi data untuk proses cetak
         let currentReportData = {};
 
         function formatTanggalIndo(dateString) {
@@ -259,10 +262,8 @@
 
             const tanggalFormatted = formatTanggalIndo(tanggalInput);
 
-            // Simpan ke state global untuk nama file
             currentReportData = { jenis, tanggalInput };
 
-            // Render ke UI Template PDF
             document.getElementById('pdf-title-jenis').innerText = jenis;
             document.getElementById('pdf-hari').innerText = tanggalFormatted;
             document.getElementById('pdf-program').innerText = program;
@@ -297,7 +298,7 @@
             .then(response => {
                 resetTombolSimpan(originalBtnHtml, btn);
                 if (response.status === "sukses") {
-                    bukaPratinjau(); // Buka Jendela Pratinjau Jika Sukses
+                    bukaPratinjau();
                 } else {
                     alert("Gagal menyimpan data: " + response.pesan);
                 }
@@ -305,7 +306,6 @@
             .catch(error => {
                 console.error("Fetch Error:", error);
                 resetTombolSimpan(originalBtnHtml, btn);
-                // Tetap buka pratinjau walau fetch diblokir (bypass CORS error di browser tertentu)
                 alert("Berhasil memproses dokumen, tapi pastikan data masuk di Spreadsheet.");
                 bukaPratinjau(); 
             });
@@ -314,15 +314,15 @@
         // TAHAP 2: Mengelola Jendela Pratinjau (Modal)
         function bukaPratinjau() {
             document.getElementById('preview-modal').classList.remove('hidden');
-            document.body.style.overflow = 'hidden'; // Kunci scroll di belakang
+            document.body.style.overflow = 'hidden'; 
         }
 
         function tutupPratinjau() {
             document.getElementById('preview-modal').classList.add('hidden');
-            document.body.style.overflow = 'auto'; // Kembalikan scroll
+            document.body.style.overflow = 'auto'; 
         }
 
-        // TAHAP 3: Eksekusi html2pdf pada Template yang Terlihat
+        // TAHAP 3: Eksekusi Cetak PDF
         function cetakPDF() {
             const btnCetak = document.getElementById('btn-cetak');
             const originalCetakHtml = btnCetak.innerHTML;
@@ -334,13 +334,13 @@
             const safeDate = currentReportData.tanggalInput.replace(/-/g, "");
             const fileName = `Catatan_Harian_${currentReportData.jenis}_${safeDate}.pdf`;
 
+            // PERBAIKAN FATAL: Margin harus 0, biarkan padding CSS yang mengatur ruang kosong.
             const opt = {
-                margin:       [0.5, 0, 0.5, 0], // Margin atas & bawah. Kiri-kanan diatur padding HTML
+                margin:       0, 
                 filename:     fileName,
-                image:        { type: 'jpeg', quality: 0.98 },
-                html2canvas:  { scale: 2, useCORS: true, letterRendering: true },
-                jsPDF:        { unit: 'in', format: 'a4', orientation: 'portrait' },
-                pagebreak:    { mode: 'avoid-all' } // Mencegah potongan aneh di tengah teks
+                image:        { type: 'jpeg', quality: 1 },
+                html2canvas:  { scale: 2, useCORS: true },
+                jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
             };
 
             html2pdf().set(opt).from(element).save().then(() => {
@@ -348,8 +348,8 @@
                 btnCetak.disabled = false;
                 btnCetak.classList.remove('opacity-70', 'cursor-not-allowed');
                 
-                tutupPratinjau(); // Tutup otomatis setelah unduh
-                document.getElementById('laporanForm').reset(); // Kosongkan form
+                tutupPratinjau(); 
+                document.getElementById('laporanForm').reset(); 
                 
                 setTimeout(() => {
                     alert("Cetak Selesai! PDF berhasil diunduh.");
