@@ -213,7 +213,7 @@
             </form>
         </div>
 
-        <!-- BAGIAN 2: RIWAYAT LAPORAN (Dapat Diklik Langsung untuk Cetak) -->
+        <!-- BAGIAN 2: RIWAYAT LAPORAN (Sistem Cache & Klik untuk Cetak) -->
         <div class="bg-white rounded-[1.5rem] md:rounded-[2rem] shadow-sm border border-slate-200 overflow-hidden mt-8 animate-slide-up" style="animation-delay: 0.1s;">
             <div class="bg-slate-50 px-6 py-5 border-b border-slate-200 flex justify-between items-center">
                 <div class="flex items-center gap-3">
@@ -225,7 +225,7 @@
                         <p class="text-[11px] font-medium text-slate-400 mt-1">*Klik pada baris tabel untuk mencetak ulang PDF</p>
                     </div>
                 </div>
-                <button onclick="muatRiwayat()" class="text-slate-500 hover:text-brand-600 transition-colors" title="Refresh Data">
+                <button onclick="muatRiwayat(true)" class="text-slate-500 hover:text-brand-600 transition-colors" title="Refresh Data Secara Paksa dari Server">
                     <i class="fas fa-sync-alt"></i>
                 </button>
             </div>
@@ -305,11 +305,13 @@
         </div>
     </div>
 
-    <!-- Logic Script -->
+    <!-- Logic Script yang Sempurna -->
     <script>
+        // GANTI LINK DI BAWAH INI DENGAN LINK DEPLOY WEB APP ANDA
         const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxg5RSTTOf6tUhle-7_ebhlW_3t2ekbqMO7DAYC7rs84qVImMIUBZJBeE3w8HVeVoL54A/exec';
+        
         let currentReportData = {};
-        let riwayatCache = []; // Menyimpan data riwayat agar bisa diakses instan saat diklik
+        let riwayatCache = []; 
 
         function formatTanggalIndo(dateString) {
             if (!dateString) return "";
@@ -326,32 +328,61 @@
             return `${d}/${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getFullYear()}`;
         }
 
-        document.addEventListener("DOMContentLoaded", muatRiwayat);
+        // Muat Riwayat saat halaman dibuka
+        document.addEventListener("DOMContentLoaded", () => muatRiwayat(false));
 
-        function muatRiwayat() {
+        // Fungsi Muat Riwayat dengan CACHE SISTEM agar instan (ringan)
+        function muatRiwayat(forceRefresh = false) {
             const loading = document.getElementById('loadingHistory');
             const table = document.getElementById('historyTableContainer');
             const empty = document.getElementById('emptyHistory');
             
-            loading.classList.remove('hidden');
-            table.classList.add('hidden');
-            empty.classList.add('hidden');
+            // Cek Cache Lokal Browser
+            const localCacheData = localStorage.getItem('riwayat_laporan_pplkkn');
 
+            if (localCacheData && !forceRefresh) {
+                // Jika ada cache, render INSTAN
+                try {
+                    const parsedData = JSON.parse(localCacheData);
+                    riwayatCache = parsedData;
+                    renderRiwayat(parsedData);
+                    table.classList.remove('hidden');
+                    loading.classList.add('hidden');
+                } catch(e) {
+                    console.log("Cache rusak, memuat ulang...");
+                }
+            } else {
+                loading.classList.remove('hidden');
+                table.classList.add('hidden');
+                empty.classList.add('hidden');
+            }
+
+            // Fetch ke background untuk pembaruan (silent update) jika tidak di-force
             fetch(SCRIPT_URL)
             .then(res => res.json())
             .then(data => {
-                loading.classList.add('hidden');
                 if(data.status === "sukses" && data.data.length > 0) {
-                    riwayatCache = data.data; // Simpan ke dalam cache global
-                    renderRiwayat(data.data);
+                    riwayatCache = data.data; 
+                    localStorage.setItem('riwayat_laporan_pplkkn', JSON.stringify(data.data)); // Simpan ke Cache Browser
+                    
+                    renderRiwayat(data.data); // Update tampilan tabel
                     table.classList.remove('hidden');
+                    loading.classList.add('hidden');
+                    empty.classList.add('hidden');
                 } else {
-                    empty.classList.remove('hidden');
+                    if (!localCacheData || data.data.length === 0) {
+                        empty.classList.remove('hidden');
+                        table.classList.add('hidden');
+                        loading.classList.add('hidden');
+                    }
                 }
             })
             .catch(err => {
-                loading.classList.add('hidden');
-                empty.classList.remove('hidden');
+                // Jika gagal (misal offline) tapi ada cache, tidak usah tampil error
+                if (!localCacheData) {
+                    loading.classList.add('hidden');
+                    empty.classList.remove('hidden');
+                }
             });
         }
 
@@ -361,9 +392,8 @@
             
             dataList.forEach((item, index) => {
                 let badgeClass = item.jenis.toUpperCase() === 'KKN' ? 'bg-orange-100 text-orange-700 border-orange-200' : 'bg-blue-100 text-blue-700 border-blue-200';
-                let displayDate = item.tanggal.includes("T") ? formatShortDate(item.tanggal) : item.tanggal;
+                let displayDate = String(item.tanggal).includes("T") ? formatShortDate(item.tanggal) : item.tanggal;
 
-                // Tambahkan event onclick="bukaPratinjauDariRiwayat(${index})" pada elemen <tr>
                 html += `
                     <tr onclick="bukaPratinjauDariRiwayat(${index})" class="hover:bg-slate-50 transition-colors cursor-pointer select-none">
                         <td class="px-5 py-4 whitespace-nowrap align-top text-sm font-semibold text-slate-700">${displayDate}</td>
@@ -383,7 +413,6 @@
             tbody.innerHTML = html;
         }
 
-        // FUNGSI DIKLIK LANGSUNG MENUJU PRATINJAU PDF & SIAP CETAK
         function bukaPratinjauDariRiwayat(index) {
             const data = riwayatCache[index];
             if (!data) return;
@@ -393,7 +422,6 @@
                 tanggalInput: data.tanggal 
             };
 
-            // Masukkan data riwayat langsung ke Template PDF
             document.getElementById('pdf-title-jenis').innerText = data.jenis;
             document.getElementById('pdf-hari').innerText = data.hariIndo || formatTanggalIndo(data.tanggal);
             document.getElementById('pdf-kegiatan').innerText = data.kegiatan;
@@ -407,7 +435,7 @@
         }
 
         function simpanDanPratinjau(e) {
-            e.preventDefault();
+            e.preventDefault(); // Mencegah reload dan melempar ke URL
 
             const checkedBoxes = document.querySelectorAll('input[name="pesertaAbsen"]:checked');
             if (checkedBoxes.length === 0) {
@@ -421,4 +449,110 @@
             const kegiatan = document.getElementById('kegiatan').value;
             const tempat = document.getElementById('tempat').value;
             const mitra = document.getElementById('mitra').value;
-            const...
+            const uraian = document.getElementById('uraian').value;
+            const dpl = document.getElementById('dpl').value;
+            const tanggalFormatted = formatTanggalIndo(tanggalInput);
+
+            currentReportData = { jenis, tanggalInput };
+
+            // Render ke PDF Pratinjau
+            document.getElementById('pdf-title-jenis').innerText = jenis;
+            document.getElementById('pdf-hari').innerText = tanggalFormatted;
+            document.getElementById('pdf-kegiatan').innerText = kegiatan;
+            document.getElementById('pdf-tempat').innerText = tempat;
+            document.getElementById('pdf-mitra').innerText = mitra;
+            document.getElementById('pdf-uraian').innerText = uraian;
+            document.getElementById('pdf-dpl').innerText = dpl;
+            document.getElementById('pdf-absen').innerText = daftarAbsen;
+
+            const btn = document.getElementById('btn-submit');
+            const originalBtnHtml = btn.innerHTML;
+            btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Menyimpan...`;
+            btn.disabled = true;
+            btn.classList.add('opacity-70', 'cursor-not-allowed');
+
+            const formData = new URLSearchParams();
+            formData.append('jenisLaporan', jenis);
+            formData.append('tanggalFormatted', tanggalInput);
+            formData.append('kegiatan', kegiatan);
+            formData.append('tempat', tempat);
+            formData.append('mitra', mitra);
+            formData.append('uraian', uraian);
+            formData.append('dpl', dpl);
+            formData.append('hariBulanTahun', tanggalFormatted);
+            formData.append('absen', daftarAbsen);
+
+            fetch(SCRIPT_URL, {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(response => {
+                resetTombolSimpan(originalBtnHtml, btn);
+                if (response.status === "sukses") {
+                    bukaPratinjau();
+                    muatRiwayat(true); // Memaksa tarik data dari server agar update yang baru tersimpan masuk
+                } else {
+                    alert("Gagal menyimpan data: " + response.pesan);
+                }
+            })
+            .catch(error => {
+                resetTombolSimpan(originalBtnHtml, btn);
+                alert("Data diproses, pratinjau disiapkan.");
+                bukaPratinjau(); 
+                muatRiwayat(true);
+            });
+        }
+
+        function bukaPratinjau() {
+            document.getElementById('preview-modal').classList.remove('hidden');
+            document.body.style.overflow = 'hidden'; 
+        }
+
+        function tutupPratinjau() {
+            document.getElementById('preview-modal').classList.add('hidden');
+            document.body.style.overflow = 'auto'; 
+        }
+
+        function cetakPDF() {
+            const btnCetak = document.getElementById('btn-cetak');
+            const originalCetakHtml = btnCetak.innerHTML;
+            btnCetak.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Menyusun...`;
+            btnCetak.disabled = true;
+            btnCetak.classList.add('opacity-70', 'cursor-not-allowed');
+
+            const element = document.getElementById('pdf-template');
+            const safeDate = currentReportData.tanggalInput ? currentReportData.tanggalInput.replace(/-/g, "") : "Riwayat";
+            const fileName = `Catatan_Harian_${currentReportData.jenis}_${safeDate}.pdf`;
+
+            const opt = {
+                margin:       0, 
+                filename:     fileName,
+                image:        { type: 'jpeg', quality: 1 },
+                html2canvas:  { scale: 2, useCORS: true },
+                jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
+
+            html2pdf().set(opt).from(element).save().then(() => {
+                btnCetak.innerHTML = originalCetakHtml;
+                btnCetak.disabled = false;
+                btnCetak.classList.remove('opacity-70', 'cursor-not-allowed');
+                
+                tutupPratinjau(); 
+                document.getElementById('laporanForm').reset(); 
+            }).catch(err => {
+                alert('Terjadi kesalahan saat mencetak PDF.');
+                btnCetak.innerHTML = originalCetakHtml;
+                btnCetak.disabled = false;
+                btnCetak.classList.remove('opacity-70', 'cursor-not-allowed');
+            });
+        }
+
+        function resetTombolSimpan(originalHtml, btn) {
+            btn.innerHTML = originalHtml;
+            btn.disabled = false;
+            btn.classList.remove('opacity-70', 'cursor-not-allowed');
+        }
+    </script>
+</body>
+</html>
