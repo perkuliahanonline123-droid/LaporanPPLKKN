@@ -104,19 +104,30 @@
                     </div>
                 </div>
 
-                <!-- Uraian -->
+                <!-- Deskripsi Kegiatan -->
                 <div>
-                    <label for="uraian" class="block mb-1.5 text-sm font-bold text-slate-700">Uraian Kegiatan <span class="text-red-500">*</span></label>
+                    <label for="uraian" class="block mb-1.5 text-sm font-bold text-slate-700">Deskripsi Kegiatan <span class="text-red-500">*</span></label>
                     <textarea id="uraian" required rows="5" placeholder="Ceritakan detail jalannya kegiatan secara naratif..." class="bg-slate-50 border border-slate-200 text-slate-800 text-sm rounded-lg focus:ring-brand-500 focus:border-brand-500 block w-full p-2.5 outline-none transition-all custom-scrollbar"></textarea>
                 </div>
 
-                <!-- DPL -->
+                <!-- DPL (Diubah menjadi Dropdown) -->
                 <div>
                     <label for="dpl" class="block mb-1.5 text-sm font-bold text-slate-700">Dosen Pembimbing Lapangan (DPL) <span class="text-red-500">*</span></label>
-                    <input type="text" id="dpl" required placeholder="Contoh: Abdul Hakim, S.H., M.A." class="bg-slate-50 border border-slate-200 text-slate-800 text-sm rounded-lg focus:ring-brand-500 focus:border-brand-500 block w-full p-2.5 outline-none transition-all">
+                    <select id="dpl" required class="bg-slate-50 border border-slate-200 text-slate-800 text-sm rounded-lg focus:ring-brand-500 focus:border-brand-500 block w-full p-2.5 outline-none transition-all">
+                        <option value="" disabled selected>Pilih Dosen Pembimbing Lapangan...</option>
+                        <option value="Abdul Hakim, S.H., M.A.">Abdul Hakim, S.H., M.A.</option>
+                        <option value="Abdul Wahid, M.H.">Abdul Wahid, M.H.</option>
+                        <option value="Abdullah Husen, M.Pd.">Abdullah Husen, M.Pd.</option>
+                        <option value="Machrus Ali Syifa, S.H.I., M.H.">Machrus Ali Syifa, S.H.I., M.H.</option>
+                        <option value="Moh Musyfiq Khazin, M.A.">Moh Musyfiq Khazin, M.A.</option>
+                        <option value="Moh. Ahsin, S.H.I., M.H.">Moh. Ahsin, S.H.I., M.H.</option>
+                        <option value="Muhammad Fadhilah Akbari, S.Pd.I., M.Hum.">Muhammad Fadhilah Akbari, S.Pd.I., M.Hum.</option>
+                        <option value="Wahyu, S.Pd.I., M.Hum.">Wahyu, S.Pd.I., M.Hum.</option>
+                        <option value="Zaki Saiful Alam, S.H.I., M.H.">Zaki Saiful Alam, S.H.I., M.H.</option>
+                    </select>
                 </div>
 
-                <!-- Baris Terakhir (Dipindah ke bawah): Absensi Otomatis -->
+                <!-- Absensi Otomatis -->
                 <div>
                     <label class="block mb-2 text-sm font-bold text-slate-700">Peserta yang Mengikuti Kegiatan (Hilangkan centang jika absen) <span class="text-red-500">*</span></label>
                     <div class="bg-slate-50 border border-slate-200 rounded-lg p-5 grid grid-cols-1 md:grid-cols-2 gap-6 max-h-72 overflow-y-auto custom-scrollbar">
@@ -228,9 +239,9 @@
                             <tr><td style="font-weight: bold; vertical-align: top; padding-bottom: 15px;">Tempat</td><td style="vertical-align: top; padding-bottom: 15px;">:</td><td id="pdf-tempat" style="vertical-align: top; padding-bottom: 15px; line-height: 1.6;"></td></tr>
                             <tr><td style="font-weight: bold; vertical-align: top; padding-bottom: 15px;">Mitra</td><td style="vertical-align: top; padding-bottom: 15px;">:</td><td id="pdf-mitra" style="vertical-align: top; padding-bottom: 15px; line-height: 1.6;"></td></tr>
                             <tr><td style="font-weight: bold; vertical-align: top; padding-bottom: 15px;">Peserta Hadir</td><td style="vertical-align: top; padding-bottom: 15px;">:</td><td id="pdf-absen" style="vertical-align: top; padding-bottom: 15px; line-height: 1.6; text-align: justify;"></td></tr>
+                            <tr><td style="font-weight: bold; vertical-align: top; padding-bottom: 15px;">Deskripsi Kegiatan</td><td style="vertical-align: top; padding-bottom: 15px;">:</td><td id="pdf-uraian" style="vertical-align: top; padding-bottom: 15px; line-height: 1.6; text-align: justify; white-space: pre-wrap;"></td></tr>
                         </table>
-                        <h3 style="text-align: center; font-size: 20px; font-weight: bold; margin-bottom: 25px;">Uraian Kegiatan</h3>
-                        <p id="pdf-uraian" style="text-align: justify; font-size: 16px; line-height: 1.8; text-indent: 48px; white-space: pre-wrap; margin-bottom: 80px;"></p>
+                        
                         <div style="margin-top: 60px; text-align: center; width: 350px; margin-left: auto; margin-right: auto;">
                             <p style="margin: 0; font-size: 16px; line-height: 1.5;">Mengetahui</p>
                             <p style="margin: 0; font-size: 16px; line-height: 1.5;">Dosen Pembimbing Lapangan,</p><br><br><br><br>
@@ -245,6 +256,7 @@
 
     <!-- Logic Script -->
     <script>
+        // PASTIKAN URL BERIKUT ADALAH URL DEPLOYMENT ANDA YANG TERBARU
         const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxg5RSTTOf6tUhle-7_ebhlW_3t2ekbqMO7DAYC7rs84qVImMIUBZJBeE3w8HVeVoL54A/exec';
         
         let currentReportData = {};
@@ -267,7 +279,6 @@
 
         // Muat Riwayat & Peserta saat halaman dibuka
         document.addEventListener("DOMContentLoaded", () => {
-            // Tampilkan cache peserta instan jika ada
             const cachePeserta = localStorage.getItem('peserta_pplkkn_cache');
             if(cachePeserta) {
                 try { renderPesertaOtomatis(JSON.parse(cachePeserta)); } catch(e){}
@@ -320,7 +331,6 @@
             fetch(SCRIPT_URL)
             .then(res => res.json())
             .then(data => {
-                // Render List Peserta jika ditarik dari server
                 if(data.peserta) {
                     renderPesertaOtomatis(data.peserta);
                     localStorage.setItem('peserta_pplkkn_cache', JSON.stringify(data.peserta));
