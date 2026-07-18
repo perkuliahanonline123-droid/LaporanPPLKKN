@@ -314,8 +314,17 @@
         let riwayatCache = []; 
 
         function formatTanggalIndo(dateString) {
-            if (!dateString) return "";
-            const date = new Date(dateString);
+            if (!dateString) return "-";
+            
+            // Ambil hanya YYYY-MM-DD jika formatnya adalah ISO string dari Google
+            let safeDateString = String(dateString);
+            if (safeDateString.includes('T')) {
+                safeDateString = safeDateString.split('T')[0];
+            }
+            
+            const date = new Date(safeDateString);
+            if (isNaN(date.getTime())) return dateString; // Kembalikan string asli jika gagal di-parsing
+
             const days = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
             const months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
             return `${days[date.getDay()]}, ${date.getDate()} ${months[date.getMonth()]} ${date.getFullYear()}`;
@@ -521,22 +530,38 @@
             btnCetak.disabled = true;
             btnCetak.classList.add('opacity-70', 'cursor-not-allowed');
 
-            const element = document.getElementById('pdf-template');
-            const safeDate = currentReportData.tanggalInput ? currentReportData.tanggalInput.replace(/-/g, "") : "Riwayat";
+            // 1. Ambil elemen asli
+            const originalElement = document.getElementById('pdf-template');
+            
+            // 2. Kloning elemen (Agar bebas dari pengaruh margin/padding Modal Pop-up)
+            const clonedElement = originalElement.cloneNode(true);
+            
+            // 3. Sembunyikan kloningan di luar layar secara absolut (pojok kiri atas)
+            clonedElement.style.position = 'absolute';
+            clonedElement.style.top = '0';
+            clonedElement.style.left = '0';
+            clonedElement.style.zIndex = '-9999';
+            document.body.appendChild(clonedElement);
+
+            const safeDate = currentReportData.tanggalInput ? currentReportData.tanggalInput.substring(0,10).replace(/-/g, "") : "Riwayat";
             const fileName = `Catatan_Harian_${currentReportData.jenis}_${safeDate}.pdf`;
 
             const opt = {
                 margin:       0, 
                 filename:     fileName,
                 image:        { type: 'jpeg', quality: 1 },
-                html2canvas:  { scale: 2, useCORS: true },
+                // Tambahkan scrollY: 0 dan scrollX: 0 untuk mereset koordinat tangkapan
+                html2canvas:  { scale: 2, useCORS: true, scrollY: 0, scrollX: 0 },
                 jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
             };
 
-            html2pdf().set(opt).from(element).save().then(() => {
+            // 4. Cetak menggunakan elemen kloningan
+            html2pdf().set(opt).from(clonedElement).save().then(() => {
+                // 5. Kembalikan tombol & bersihkan kloningan
                 btnCetak.innerHTML = originalCetakHtml;
                 btnCetak.disabled = false;
                 btnCetak.classList.remove('opacity-70', 'cursor-not-allowed');
+                document.body.removeChild(clonedElement); 
                 
                 tutupPratinjau(); 
                 document.getElementById('laporanForm').reset(); 
@@ -545,9 +570,9 @@
                 btnCetak.innerHTML = originalCetakHtml;
                 btnCetak.disabled = false;
                 btnCetak.classList.remove('opacity-70', 'cursor-not-allowed');
+                document.body.removeChild(clonedElement); 
             });
         }
-
         function resetTombolSimpan(originalHtml, btn) {
             btn.innerHTML = originalHtml;
             btn.disabled = false;
