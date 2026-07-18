@@ -88,7 +88,7 @@
                     </div>
                 </div>
 
-                <!-- Baris 2: Kegiatan (Full Width - Elegan) -->
+                <!-- Baris 2: Kegiatan (Full Width) -->
                 <div>
                     <label for="kegiatan" class="block mb-1.5 text-sm font-bold text-slate-700">Nama Kegiatan <span class="text-red-500">*</span></label>
                     <input type="text" id="kegiatan" required placeholder="Contoh: Kajian Keagamaan Rutin Jamaah..." class="bg-slate-50 border border-slate-200 text-slate-800 text-sm rounded-lg focus:ring-brand-500 focus:border-brand-500 block w-full p-2.5 outline-none transition-all">
@@ -106,7 +106,7 @@
                     </div>
                 </div>
 
-                <!-- Baris 4: Absensi Otomatis Terconteng (Checked) -->
+                <!-- Baris 4: Absensi -->
                 <div>
                     <label class="block mb-2 text-sm font-bold text-slate-700">Peserta yang Mengikuti Kegiatan (Hilangkan centang jika absen) <span class="text-red-500">*</span></label>
                     <div class="bg-slate-50 border border-slate-200 rounded-lg p-4 grid grid-cols-1 sm:grid-cols-2 gap-3 max-h-64 overflow-y-auto custom-scrollbar">
@@ -213,7 +213,7 @@
             </form>
         </div>
 
-        <!-- BAGIAN 2: RIWAYAT LAPORAN (Sistem Cache & Klik untuk Cetak) -->
+        <!-- BAGIAN 2: RIWAYAT LAPORAN -->
         <div class="bg-white rounded-[1.5rem] md:rounded-[2rem] shadow-sm border border-slate-200 overflow-hidden mt-8 animate-slide-up" style="animation-delay: 0.1s;">
             <div class="bg-slate-50 px-6 py-5 border-b border-slate-200 flex justify-between items-center">
                 <div class="flex items-center gap-3">
@@ -283,6 +283,8 @@
             
             <div class="p-6 md:p-10 bg-slate-200 flex justify-center overflow-x-auto custom-scrollbar">
                 <div class="shadow-2xl flex-shrink-0 bg-white">
+                    
+                    <!-- AREA KERTAS A4 YANG AKAN DI-CLONE SAAT DICETAK -->
                     <div id="pdf-template" style="width: 210mm; background: white; padding: 25mm 20mm; box-sizing: border-box; font-family: 'Times New Roman', Times, serif; color: #000; line-height: 1.5; text-align: left;">
                         <h2 style="font-size: 24px; font-weight: bold; margin-bottom: 40px; margin-top: 10px;">Catatan Kegiatan Harian <span id="pdf-title-jenis">PPL</span></h2>
                         <table style="width: 100%; margin-bottom: 30px; font-size: 16px; border-collapse: collapse; border: none;">
@@ -300,14 +302,13 @@
                             <u id="pdf-dpl" style="font-weight: bold; font-size: 16px;"></u>
                         </div>
                     </div>
+
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Logic Script yang Sempurna -->
     <script>
-        // GANTI LINK DI BAWAH INI DENGAN LINK DEPLOY WEB APP ANDA
         const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxg5RSTTOf6tUhle-7_ebhlW_3t2ekbqMO7DAYC7rs84qVImMIUBZJBeE3w8HVeVoL54A/exec';
         
         let currentReportData = {};
@@ -328,20 +329,16 @@
             return `${d}/${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getFullYear()}`;
         }
 
-        // Muat Riwayat saat halaman dibuka
         document.addEventListener("DOMContentLoaded", () => muatRiwayat(false));
 
-        // Fungsi Muat Riwayat dengan CACHE SISTEM agar instan (ringan)
         function muatRiwayat(forceRefresh = false) {
             const loading = document.getElementById('loadingHistory');
             const table = document.getElementById('historyTableContainer');
             const empty = document.getElementById('emptyHistory');
             
-            // Cek Cache Lokal Browser
             const localCacheData = localStorage.getItem('riwayat_laporan_pplkkn');
 
             if (localCacheData && !forceRefresh) {
-                // Jika ada cache, render INSTAN
                 try {
                     const parsedData = JSON.parse(localCacheData);
                     riwayatCache = parsedData;
@@ -357,15 +354,14 @@
                 empty.classList.add('hidden');
             }
 
-            // Fetch ke background untuk pembaruan (silent update) jika tidak di-force
             fetch(SCRIPT_URL)
             .then(res => res.json())
             .then(data => {
                 if(data.status === "sukses" && data.data.length > 0) {
                     riwayatCache = data.data; 
-                    localStorage.setItem('riwayat_laporan_pplkkn', JSON.stringify(data.data)); // Simpan ke Cache Browser
+                    localStorage.setItem('riwayat_laporan_pplkkn', JSON.stringify(data.data));
                     
-                    renderRiwayat(data.data); // Update tampilan tabel
+                    renderRiwayat(data.data);
                     table.classList.remove('hidden');
                     loading.classList.add('hidden');
                     empty.classList.add('hidden');
@@ -378,7 +374,6 @@
                 }
             })
             .catch(err => {
-                // Jika gagal (misal offline) tapi ada cache, tidak usah tampil error
                 if (!localCacheData) {
                     loading.classList.add('hidden');
                     empty.classList.remove('hidden');
@@ -435,7 +430,7 @@
         }
 
         function simpanDanPratinjau(e) {
-            e.preventDefault(); // Mencegah reload dan melempar ke URL
+            e.preventDefault();
 
             const checkedBoxes = document.querySelectorAll('input[name="pesertaAbsen"]:checked');
             if (checkedBoxes.length === 0) {
@@ -455,7 +450,6 @@
 
             currentReportData = { jenis, tanggalInput };
 
-            // Render ke PDF Pratinjau
             document.getElementById('pdf-title-jenis').innerText = jenis;
             document.getElementById('pdf-hari').innerText = tanggalFormatted;
             document.getElementById('pdf-kegiatan').innerText = kegiatan;
@@ -491,7 +485,7 @@
                 resetTombolSimpan(originalBtnHtml, btn);
                 if (response.status === "sukses") {
                     bukaPratinjau();
-                    muatRiwayat(true); // Memaksa tarik data dari server agar update yang baru tersimpan masuk
+                    muatRiwayat(true); 
                 } else {
                     alert("Gagal menyimpan data: " + response.pesan);
                 }
@@ -521,7 +515,21 @@
             btnCetak.disabled = true;
             btnCetak.classList.add('opacity-70', 'cursor-not-allowed');
 
+            // --- TRIK ISOLASI CLONE ---
+            // Pemecahan masalah "menciut ke tengah" dan "kepotong" saat scroll aktif
             const element = document.getElementById('pdf-template');
+            const clone = element.cloneNode(true);
+            
+            const wrapper = document.createElement('div');
+            wrapper.style.position = 'absolute';
+            wrapper.style.top = '0';
+            wrapper.style.left = '0';
+            wrapper.style.width = '210mm'; // Lebar pasti A4
+            wrapper.style.zIndex = '1';    // Disembunyikan di balik latar gelap modal (z-index modal = 50)
+            
+            wrapper.appendChild(clone);
+            document.body.appendChild(wrapper);
+
             const safeDate = currentReportData.tanggalInput ? currentReportData.tanggalInput.replace(/-/g, "") : "Riwayat";
             const fileName = `Catatan_Harian_${currentReportData.jenis}_${safeDate}.pdf`;
 
@@ -529,11 +537,18 @@
                 margin:       0, 
                 filename:     fileName,
                 image:        { type: 'jpeg', quality: 1 },
-                html2canvas:  { scale: 2, useCORS: true },
+                html2canvas:  { 
+                    scale: 2, 
+                    useCORS: true,
+                    scrollY: 0, // Kunci utama untuk mencegah ruang kosong di atas PDF
+                    scrollX: 0
+                },
                 jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
             };
 
-            html2pdf().set(opt).from(element).save().then(() => {
+            html2pdf().set(opt).from(clone).save().then(() => {
+                document.body.removeChild(wrapper); // Bersihkan sisa kloningan
+                
                 btnCetak.innerHTML = originalCetakHtml;
                 btnCetak.disabled = false;
                 btnCetak.classList.remove('opacity-70', 'cursor-not-allowed');
@@ -541,6 +556,7 @@
                 tutupPratinjau(); 
                 document.getElementById('laporanForm').reset(); 
             }).catch(err => {
+                document.body.removeChild(wrapper); 
                 alert('Terjadi kesalahan saat mencetak PDF.');
                 btnCetak.innerHTML = originalCetakHtml;
                 btnCetak.disabled = false;
