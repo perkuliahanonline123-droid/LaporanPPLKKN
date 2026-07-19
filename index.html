@@ -223,14 +223,13 @@
             <div class="p-6 md:p-10 bg-zinc-950 flex justify-center overflow-x-auto custom-scrollbar">
                 <div class="shadow-2xl flex-shrink-0 bg-white">
                     
-                    <!-- AREA KERTAS A4: Margin diperbarui jadi 12mm 20mm -->
+                    <!-- AREA KERTAS A4: Margin 12mm 20mm -->
                     <div id="pdf-template" style="width: 210mm; background: white; padding: 12mm 20mm; box-sizing: border-box; font-family: 'Times New Roman', Times, serif; color: #000; line-height: 1.45; text-align: left;">
                         
-                        <!-- KOP SURAT (Dibuat lebih rapat spasi antar barisnya) -->
+                        <!-- KOP SURAT -->
                         <div style="text-align: center; line-height: 1.15;">
                             <div style="font-size: 14px; font-weight: bold; letter-spacing: 1px;">PUSAT ILMU KEISLAMAN INTERNASIONAL</div>
-                            <div style="font-size: 18px; font-weight: bold; letter-spacing: 1px;">SEKOLAH TINGGI AGAMA ISLAM (STAI) IMAM SYAFI’I CIANJUR</div>
-                            <!-- SPASI ARAB DIPERBAIKI DENGAN KODE &nbsp; AGAR TIDAK HILANG SAAT DICETAK -->
+                            <div style="font-size: 18px; font-weight: bold; letter-spacing: 1px;">SEKOLAH TINGGI AGAMA ISLAM (STAI) IMAM SYAFI’I</div>
                             <div style="font-size: 20px; font-weight: bold; margin: 3px 0;">جامعة&nbsp;الإمام&nbsp;الشافعي</div>
                             <div style="font-size: 12px; margin-top: 4px;">Jl. Sarongge No. 16, RT 01/RW 04, Desa Ciputri, Kec. Pacet, Cianjur, Jawa Barat</div>
                             <div style="font-size: 12px;">Telp.: +62 851-1145-0055 | Email: staiis_cianjur@yahoo.com</div>
@@ -243,15 +242,14 @@
                         <!-- JUDUL TENGAH -->
                         <h2 style="font-size: 18px; font-weight: bold; margin-bottom: 20px; text-align: center; text-transform: uppercase;">CATATAN KEGIATAN HARIAN <span id="pdf-title-jenis">PPL</span></h2>
                         
-                        <!-- TABEL ISI -->
+                        <!-- TABEL ISI (white-space: pre-wrap DIHAPUS dari pdf-uraian) -->
                         <table style="width: 100%; margin-bottom: 15px; font-size: 15px; border-collapse: collapse; border: none;">
                             <tr><td style="width: 150px; font-weight: bold; vertical-align: top; padding-bottom: 8px;">Hari / Tanggal</td><td style="width: 20px; vertical-align: top; padding-bottom: 8px;">:</td><td id="pdf-hari" style="vertical-align: top; padding-bottom: 8px;"></td></tr>
                             <tr><td style="font-weight: bold; vertical-align: top; padding-bottom: 8px;">Kegiatan</td><td style="vertical-align: top; padding-bottom: 8px;">:</td><td id="pdf-kegiatan" style="vertical-align: top; padding-bottom: 8px; line-height: 1.45;"></td></tr>
                             <tr><td style="font-weight: bold; vertical-align: top; padding-bottom: 8px;">Tempat</td><td style="vertical-align: top; padding-bottom: 8px;">:</td><td id="pdf-tempat" style="vertical-align: top; padding-bottom: 8px; line-height: 1.45;"></td></tr>
                             <tr><td style="font-weight: bold; vertical-align: top; padding-bottom: 8px;">Mitra</td><td style="vertical-align: top; padding-bottom: 8px;">:</td><td id="pdf-mitra" style="vertical-align: top; padding-bottom: 8px; line-height: 1.45;"></td></tr>
                             <tr><td style="font-weight: bold; vertical-align: top; padding-bottom: 8px;">Peserta Hadir</td><td style="vertical-align: top; padding-bottom: 8px;">:</td><td id="pdf-absen" style="vertical-align: top; padding-bottom: 8px; line-height: 1.45; text-align: justify;"></td></tr>
-                            <!-- CSS white-space: pre-wrap DIHAPUS agar kata 'ke-8 Republik' tidak disatukan oleh engine HTML2CANVAS -->
-                            <tr><td style="font-weight: bold; vertical-align: top; padding-bottom: 8px;">Deskripsi Kegiatan</td><td style="vertical-align: top; padding-bottom: 8px;">:</td><td id="pdf-uraian" style="vertical-align: top; padding-bottom: 8px; line-height: 1.45; text-align: justify;"></td></tr>
+                            <tr><td style="font-weight: bold; vertical-align: top; padding-bottom: 8px;">Deskripsi Kegiatan</td><td style="vertical-align: top; padding-bottom: 8px;">:</td><td id="pdf-uraian" style="vertical-align: top; padding-bottom: 8px; line-height: 1.45;"></td></tr>
                         </table>
                         
                         <!-- TANDA TANGAN -->
@@ -269,7 +267,6 @@
 
     <!-- Logic Script -->
     <script>
-        // SCRIPT URL GOOGLE SHEETS
         const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxg5RSTTOf6tUhle-7_ebhlW_3t2ekbqMO7DAYC7rs84qVImMIUBZJBeE3w8HVeVoL54A/exec';
         
         let currentReportData = {};
@@ -293,6 +290,15 @@
             return `${d}/${m}/${date.getFullYear()}`;
         }
 
+        // FUNGSI BARU: Memformat Uraian agar rata kanan-kiri sempurna tanpa bug menempel
+        function formatUraianSempurna(text) {
+            if (!text) return "-";
+            return String(text).split('\n').map(line => {
+                if (line.trim() === '') return '<div style="height: 8px;"></div>';
+                return `<div style="text-align: justify; text-justify: inter-word;">${line}</div>`;
+            }).join('');
+        }
+
         document.addEventListener("DOMContentLoaded", () => {
             const cachePeserta = localStorage.getItem('peserta_pplkkn_cache');
             if(cachePeserta) {
@@ -309,7 +315,7 @@
                 if (!arr || arr.length === 0) return `<p class="text-xs text-zinc-600 italic">Tidak ada data peserta</p>`;
                 return arr.map(name => `
                     <label class="flex items-start space-x-2.5 text-sm font-medium text-zinc-300 cursor-pointer select-none group">
-                        <input type="checkbox" name="pesertaAbsen" value="${name}" class="mt-0.5 w-4 h-4 text-amber-500 bg-zinc-900 border-zinc-700 rounded focus:ring-amber-500 shrink-0 transition-colors accent-amber-500">
+                        <input type="checkbox" name="pesertaAbsen" value="${name}" checked class="mt-0.5 w-4 h-4 text-amber-500 bg-zinc-900 border-zinc-700 rounded focus:ring-amber-500 shrink-0 transition-colors accent-amber-500">
                         <span class="leading-tight group-hover:text-amber-400 transition-colors">${name}</span>
                     </label>
                 `).join('');
@@ -333,9 +339,7 @@
                     renderRiwayat(parsedData);
                     table.classList.remove('hidden');
                     loading.classList.add('hidden');
-                } catch(e) {
-                    console.log("Cache rusak...");
-                }
+                } catch(e) {}
             } else {
                 loading.classList.remove('hidden');
                 table.classList.add('hidden');
@@ -417,8 +421,7 @@
             document.getElementById('pdf-kegiatan').innerText = data.kegiatan;
             document.getElementById('pdf-tempat').innerText = data.tempat;
             document.getElementById('pdf-mitra').innerText = data.mitra;
-            // Menggunakan innerHTML dan mengubah newline menjadi <br> agar html2canvas tidak error menelan spasi pada justify
-            document.getElementById('pdf-uraian').innerHTML = data.uraian ? String(data.uraian).replace(/\n/g, '<br>') : '';
+            document.getElementById('pdf-uraian').innerHTML = formatUraianSempurna(data.uraian);
             document.getElementById('pdf-dpl').innerText = data.dpl;
             document.getElementById('pdf-absen').innerText = data.absen || "-";
 
@@ -451,8 +454,7 @@
             document.getElementById('pdf-kegiatan').innerText = kegiatan;
             document.getElementById('pdf-tempat').innerText = tempat;
             document.getElementById('pdf-mitra').innerText = mitra;
-            // Menggunakan innerHTML dan mengubah newline menjadi <br> agar html2canvas tidak error menelan spasi pada justify
-            document.getElementById('pdf-uraian').innerHTML = uraian ? String(uraian).replace(/\n/g, '<br>') : '';
+            document.getElementById('pdf-uraian').innerHTML = formatUraianSempurna(uraian);
             document.getElementById('pdf-dpl').innerText = dpl;
             document.getElementById('pdf-absen').innerText = daftarAbsen;
 
