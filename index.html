@@ -126,7 +126,8 @@
 
                 <!-- Absensi Otomatis -->
                 <div>
-                    <label class="block mb-3 text-xs font-bold uppercase tracking-wider text-zinc-400">Peserta yang Mengikuti Kegiatan (Hilangkan centang jika absen) <span class="text-amber-500">*</span></label>
+                    <!-- Teks label diperbarui untuk penyesuaian instruksi manual -->
+                    <label class="block mb-3 text-xs font-bold uppercase tracking-wider text-zinc-400">Peserta yang Mengikuti Kegiatan (Centang yang hadir) <span class="text-amber-500">*</span></label>
                     <div class="bg-zinc-950 border border-zinc-800 rounded-lg p-5 grid grid-cols-1 md:grid-cols-2 gap-6 max-h-72 overflow-y-auto custom-scrollbar">
                         
                         <!-- Kiri: Hukum Keluarga Islam -->
@@ -286,8 +287,9 @@
             function buildCheckboxes(arr) {
                 if (!arr || arr.length === 0) return `<p class="text-xs text-zinc-600 italic">Tidak ada data peserta</p>`;
                 return arr.map(name => `
+                    <!-- Atribut "checked" telah dihapus dari input checkbox di bawah ini -->
                     <label class="flex items-start space-x-2.5 text-sm font-medium text-zinc-300 cursor-pointer select-none group">
-                        <input type="checkbox" name="pesertaAbsen" value="${name}" checked class="mt-0.5 w-4 h-4 text-amber-500 bg-zinc-900 border-zinc-700 rounded focus:ring-amber-500 shrink-0 transition-colors accent-amber-500">
+                        <input type="checkbox" name="pesertaAbsen" value="${name}" class="mt-0.5 w-4 h-4 text-amber-500 bg-zinc-900 border-zinc-700 rounded focus:ring-amber-500 shrink-0 transition-colors accent-amber-500">
                         <span class="leading-tight group-hover:text-amber-400 transition-colors">${name}</span>
                     </label>
                 `).join('');
@@ -360,7 +362,6 @@
                 let badgeClass = item.jenis.toUpperCase() === 'KKN' ? 'bg-amber-950/50 text-amber-400 border-amber-900/50' : 'bg-zinc-800 text-zinc-300 border-zinc-700';
                 let displayDate = String(item.tanggal).includes("T") ? formatShortDate(item.tanggal) : item.tanggal;
 
-                // Disesuaikan untuk lebar kolom riwayat (lebih kompak karena layout kanan/kiri)
                 html += `
                     <tr onclick="bukaPratinjauDariRiwayat(${index})" class="hover:bg-zinc-800/40 border-b border-zinc-800/60 transition-colors cursor-pointer select-none group">
                         <td class="px-5 py-4 align-top w-24">
@@ -403,7 +404,7 @@
 
             const checkedBoxes = document.querySelectorAll('input[name="pesertaAbsen"]:checked');
             if (checkedBoxes.length === 0) {
-                alert("Silakan tentukan minimal satu peserta yang hadir!");
+                alert("Silakan centang minimal satu peserta yang hadir!");
                 return;
             }
             const daftarAbsen = Array.from(checkedBoxes).map(cb => cb.value).join(', ');
