@@ -223,9 +223,25 @@
             <div class="p-6 md:p-10 bg-zinc-950 flex justify-center overflow-x-auto custom-scrollbar">
                 <div class="shadow-2xl flex-shrink-0 bg-white">
                     
-                    <!-- AREA KERTAS A4: Margin diperbarui jadi 20mm 20mm -->
+                    <!-- AREA KERTAS A4 -->
                     <div id="pdf-template" style="width: 210mm; background: white; padding: 20mm 20mm; box-sizing: border-box; font-family: 'Times New Roman', Times, serif; color: #000; line-height: 1.5; text-align: left;">
-                        <h2 style="font-size: 24px; font-weight: bold; margin-bottom: 40px; margin-top: 10px;">Catatan Kegiatan Harian <span id="pdf-title-jenis">PPL</span></h2>
+                        
+                        <!-- KOP SURAT -->
+                        <div style="text-align: center; line-height: 1.2;">
+                            <div style="font-size: 14px; font-weight: bold; letter-spacing: 1px;">PUSAT ILMU KEISLAMAN INTERNASIONAL</div>
+                            <div style="font-size: 18px; font-weight: bold; letter-spacing: 1px;">SEKOLAH TINGGI AGAMA ISLAM (STAI) IMAM SYAFI’I</div>
+                            <div style="font-size: 20px; font-weight: bold; margin: 4px 0;">جامعة الإمام الشافعي</div>
+                            <div style="font-size: 12px; margin-top: 5px;">Jl. Sarongge No. 16, RT 01/RW 04, Desa Ciputri, Kec. Pacet, Cianjur, Jawa Barat</div>
+                            <div style="font-size: 12px;">Telp.: +62 851-1145-0055 | Email: staiis_cianjur@yahoo.com</div>
+                        </div>
+                        
+                        <!-- GARIS PEMBATAS KOP -->
+                        <div style="margin-top: 15px; margin-bottom: 2px; border-bottom: 3px solid black;"></div>
+                        <div style="margin-bottom: 25px; border-bottom: 1px solid black;"></div>
+
+                        <!-- JUDUL TENGAH -->
+                        <h2 style="font-size: 20px; font-weight: bold; margin-bottom: 30px; text-align: center; text-transform: uppercase;">CATATAN KEGIATAN HARIAN <span id="pdf-title-jenis">PPL</span></h2>
+                        
                         <table style="width: 100%; margin-bottom: 30px; font-size: 16px; border-collapse: collapse; border: none;">
                             <tr><td style="width: 160px; font-weight: bold; vertical-align: top; padding-bottom: 15px;">Hari / Tanggal</td><td style="width: 25px; vertical-align: top; padding-bottom: 15px;">:</td><td id="pdf-hari" style="vertical-align: top; padding-bottom: 15px;"></td></tr>
                             <tr><td style="font-weight: bold; vertical-align: top; padding-bottom: 15px;">Kegiatan</td><td style="vertical-align: top; padding-bottom: 15px;">:</td><td id="pdf-kegiatan" style="vertical-align: top; padding-bottom: 15px; line-height: 1.6;"></td></tr>
@@ -385,7 +401,6 @@
 
             currentReportData = { jenis: data.jenis, tanggalInput: data.tanggal };
 
-            // PERBAIKAN BUG TANGGAL ISO: Paksa ubah format jika terdeteksi 'T' / 'Z'
             let tanggalTampil = data.hariIndo;
             if (!tanggalTampil || String(tanggalTampil).includes("T") || String(tanggalTampil).includes("Z")) {
                 tanggalTampil = formatTanggalIndo(data.tanggal);
