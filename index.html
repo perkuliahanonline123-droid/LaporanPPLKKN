@@ -48,16 +48,16 @@
         <div class="absolute top-0 right-0 w-64 h-64 bg-amber-500/5 rounded-full blur-3xl -mr-20 -mt-20 pointer-events-none"></div>
         <div class="relative z-10 flex flex-col items-start text-left max-w-7xl mx-auto w-full">
             <span class="text-[10px] md:text-xs font-bold tracking-[0.2em] text-amber-500 uppercase mb-3 inline-block">LAYANAN ADMINISTRASI AKADEMIK • 2026</span>
-            <h1 class="font-serif text-3xl md:text-4xl lg:text-5xl font-bold leading-tight tracking-wide text-zinc-100">Laporan Akhir KKN-PPL Terpadu</h1>
+            <h1 class="font-serif text-3xl md:text-4xl lg:text-5xl font-bold leading-tight tracking-wide text-zinc-100">Laporan Kegiatan KKN-PPL Terpadu</h1>
             <p class="text-zinc-400 text-sm md:text-base mt-2 md:mt-3 max-w-2xl font-normal">Isi formulir, simpan ke database, atau klik langsung pada daftar riwayat untuk cetak ulang PDF.</p>
         </div>
     </header>
 
-    <!-- Main Content -->
-    <main class="w-full max-w-4xl mx-auto px-4 md:px-8 mt-8 relative z-20 space-y-8 pb-12 flex-1">
+    <!-- Main Content (2 Columns on Desktop) -->
+    <main class="w-full max-w-7xl mx-auto px-4 md:px-8 mt-8 relative z-20 pb-12 flex-1 grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
         
-        <!-- BAGIAN 1: FORMULIR -->
-        <div class="bg-zinc-900/80 rounded-xl shadow-timbul border border-zinc-800/80 p-6 md:p-10 w-full animate-slide-up">
+        <!-- BAGIAN KIRI: FORMULIR -->
+        <div class="lg:col-span-7 bg-zinc-900/80 rounded-xl shadow-timbul border border-zinc-800/80 p-6 md:p-10 w-full animate-slide-up">
             <div class="flex items-center gap-2 mb-8 pb-4 border-b border-zinc-800">
                 <span class="text-amber-500 font-serif text-xl font-bold">|</span>
                 <div>
@@ -72,7 +72,7 @@
                     <div>
                         <label for="jenisLaporan" class="block mb-2 text-xs font-bold uppercase tracking-wider text-zinc-400">Jenis Laporan <span class="text-amber-500">*</span></label>
                         <select id="jenisLaporan" required class="bg-zinc-950 border border-zinc-800 text-zinc-100 text-sm rounded-lg focus:ring-1 focus:ring-amber-500 focus:border-amber-500 block w-full p-3 outline-none transition-all">
-                            <option value="" disabled selected>Pilih jenis kegiatan...</option>
+                            <option value="" disabled selected>Pilih jenis...</option>
                             <option value="PPL">PPL</option>
                             <option value="KKN">KKN</option>
                         </select>
@@ -107,7 +107,7 @@
                     <textarea id="uraian" required rows="5" placeholder="Ceritakan detail jalannya kegiatan secara naratif..." class="bg-zinc-950 border border-zinc-800 text-zinc-100 text-sm rounded-lg focus:ring-1 focus:ring-amber-500 focus:border-amber-500 block w-full p-3 outline-none transition-all custom-scrollbar placeholder-zinc-600"></textarea>
                 </div>
 
-                <!-- DPL (Diubah menjadi Dropdown) -->
+                <!-- DPL -->
                 <div>
                     <label for="dpl" class="block mb-2 text-xs font-bold uppercase tracking-wider text-zinc-400">Dosen Pembimbing Lapangan (DPL) <span class="text-amber-500">*</span></label>
                     <select id="dpl" required class="bg-zinc-950 border border-zinc-800 text-zinc-100 text-sm rounded-lg focus:ring-1 focus:ring-amber-500 focus:border-amber-500 block w-full p-3 outline-none transition-all">
@@ -133,7 +133,7 @@
                         <div>
                             <h4 class="font-bold text-xs uppercase tracking-wider text-amber-500 border-b border-zinc-800 pb-2 mb-3">Hukum Keluarga Islam</h4>
                             <div id="list-hki" class="space-y-2.5">
-                                <p class="text-xs text-zinc-500 animate-pulse">Menghubungkan ke database peserta...</p>
+                                <p class="text-xs text-zinc-500 animate-pulse">Menghubungkan ke database...</p>
                             </div>
                         </div>
 
@@ -141,7 +141,7 @@
                         <div>
                             <h4 class="font-bold text-xs uppercase tracking-wider text-amber-500 border-b border-zinc-800 pb-2 mb-3">Pendidikan Bahasa Arab</h4>
                             <div id="list-pba" class="space-y-2.5">
-                                <p class="text-xs text-zinc-500 animate-pulse">Menghubungkan ke database peserta...</p>
+                                <p class="text-xs text-zinc-500 animate-pulse">Menghubungkan ke database...</p>
                             </div>
                         </div>
 
@@ -156,14 +156,14 @@
             </form>
         </div>
 
-        <!-- BAGIAN 2: RIWAYAT LAPORAN -->
-        <div class="bg-zinc-900/80 rounded-xl shadow-timbul border border-zinc-800/80 overflow-hidden mt-8 animate-slide-up" style="animation-delay: 0.1s;">
+        <!-- BAGIAN KANAN: RIWAYAT LAPORAN (Sticky on Desktop) -->
+        <div class="lg:col-span-5 bg-zinc-900/80 rounded-xl shadow-timbul border border-zinc-800/80 overflow-hidden animate-slide-up sticky top-8" style="animation-delay: 0.1s;">
             <div class="bg-zinc-900 px-6 py-5 border-b border-zinc-800 flex justify-between items-center">
                 <div class="flex items-center gap-2">
                     <span class="text-amber-500 font-serif text-xl font-bold">|</span>
                     <div>
                         <h2 class="font-bold text-sm tracking-widest text-zinc-400 uppercase leading-none">LOG TERAKHIR / RIWAYAT</h2>
-                        <p class="text-[11px] font-medium text-zinc-500 mt-1">*Klik pada baris tabel untuk mencetak ulang PDF</p>
+                        <p class="text-[11px] font-medium text-zinc-500 mt-1">*Klik baris untuk mencetak ulang</p>
                     </div>
                 </div>
                 <button onclick="muatRiwayat(true)" class="text-zinc-500 hover:text-amber-500 transition-colors" title="Refresh Data Secara Paksa dari Server">
@@ -176,14 +176,12 @@
                 <p class="text-sm font-medium text-zinc-500">Memuat riwayat...</p>
             </div>
 
-            <div id="historyTableContainer" class="hidden overflow-x-auto custom-scrollbar">
+            <div id="historyTableContainer" class="hidden overflow-x-auto overflow-y-auto max-h-[600px] custom-scrollbar">
                 <table class="min-w-full divide-y divide-zinc-800 text-left">
-                    <thead class="bg-zinc-950">
+                    <thead class="bg-zinc-950 sticky top-0 z-10">
                         <tr>
-                            <th scope="col" class="px-5 py-3.5 text-[11px] font-bold text-zinc-400 uppercase tracking-wider whitespace-nowrap">Tanggal</th>
-                            <th scope="col" class="px-5 py-3.5 text-[11px] font-bold text-zinc-400 uppercase tracking-wider whitespace-nowrap">Jenis</th>
-                            <th scope="col" class="px-5 py-3.5 text-[11px] font-bold text-zinc-400 uppercase tracking-wider w-full">Kegiatan & Tempat</th>
-                            <th scope="col" class="px-5 py-3.5 text-[11px] font-bold text-zinc-400 uppercase tracking-wider whitespace-nowrap">DPL</th>
+                            <th scope="col" class="px-5 py-3.5 text-[11px] font-bold text-zinc-400 uppercase tracking-wider whitespace-nowrap">Status</th>
+                            <th scope="col" class="px-5 py-3.5 text-[11px] font-bold text-zinc-400 uppercase tracking-wider w-full">Kegiatan</th>
                         </tr>
                     </thead>
                     <tbody id="historyBody" class="divide-y divide-zinc-800/60 bg-zinc-900/20">
@@ -225,7 +223,7 @@
             <div class="p-6 md:p-10 bg-zinc-950 flex justify-center overflow-x-auto custom-scrollbar">
                 <div class="shadow-2xl flex-shrink-0 bg-white">
                     
-                    <!-- AREA KERTAS A4 (Tetap Putih agar Hasil Cetak Printer Bagus) -->
+                    <!-- AREA KERTAS A4 -->
                     <div id="pdf-template" style="width: 210mm; background: white; padding: 25mm 20mm; box-sizing: border-box; font-family: 'Times New Roman', Times, serif; color: #000; line-height: 1.5; text-align: left;">
                         <h2 style="font-size: 24px; font-weight: bold; margin-bottom: 40px; margin-top: 10px;">Catatan Kegiatan Harian <span id="pdf-title-jenis">PPL</span></h2>
                         <table style="width: 100%; margin-bottom: 30px; font-size: 16px; border-collapse: collapse; border: none;">
@@ -251,7 +249,7 @@
 
     <!-- Logic Script -->
     <script>
-        // PASTIKAN URL BERIKUT ADALAH URL DEPLOYMENT ANDA YANG TERBARU
+        // SCRIPT URL GOOGLE SHEETS
         const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxg5RSTTOf6tUhle-7_ebhlW_3t2ekbqMO7DAYC7rs84qVImMIUBZJBeE3w8HVeVoL54A/exec';
         
         let currentReportData = {};
@@ -269,10 +267,10 @@
             if (!dateString) return "-";
             const date = new Date(dateString);
             const d = date.getDate().toString().padStart(2, '0');
-            return `${d}/${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getFullYear()}`;
+            const m = (date.getMonth() + 1).toString().padStart(2, '0');
+            return `${d}/${m}/${date.getFullYear()}`;
         }
 
-        // Muat Riwayat & Peserta saat halaman dibuka
         document.addEventListener("DOMContentLoaded", () => {
             const cachePeserta = localStorage.getItem('peserta_pplkkn_cache');
             if(cachePeserta) {
@@ -281,7 +279,6 @@
             muatRiwayat(false);
         });
 
-        // Merender Checkbox secara dinamis (Disesuaikan dengan tema Gelap & Emas)
         function renderPesertaOtomatis(pesertaData) {
             const listHKI = document.getElementById('list-hki');
             const listPBA = document.getElementById('list-pba');
@@ -355,7 +352,6 @@
             });
         }
 
-        // Merender data baris tabel (Disesuaikan dengan gaya Gelap & Emas)
         function renderRiwayat(dataList) {
             const tbody = document.getElementById('historyBody');
             let html = '';
@@ -364,19 +360,20 @@
                 let badgeClass = item.jenis.toUpperCase() === 'KKN' ? 'bg-amber-950/50 text-amber-400 border-amber-900/50' : 'bg-zinc-800 text-zinc-300 border-zinc-700';
                 let displayDate = String(item.tanggal).includes("T") ? formatShortDate(item.tanggal) : item.tanggal;
 
+                // Disesuaikan untuk lebar kolom riwayat (lebih kompak karena layout kanan/kiri)
                 html += `
-                    <tr onclick="bukaPratinjauDariRiwayat(${index})" class="hover:bg-zinc-800/40 border-b border-zinc-800/60 transition-colors cursor-pointer select-none">
-                        <td class="px-5 py-4 whitespace-nowrap align-top text-sm font-semibold text-zinc-400">${displayDate}</td>
-                        <td class="px-5 py-4 whitespace-nowrap align-top">
-                            <span class="inline-flex items-center px-2.5 py-0.5 rounded text-[10px] font-bold tracking-wider border ${badgeClass}">
+                    <tr onclick="bukaPratinjauDariRiwayat(${index})" class="hover:bg-zinc-800/40 border-b border-zinc-800/60 transition-colors cursor-pointer select-none group">
+                        <td class="px-5 py-4 align-top w-24">
+                            <div class="text-xs font-bold text-zinc-400 mb-1.5">${displayDate}</div>
+                            <span class="inline-flex items-center px-2 py-0.5 rounded text-[9px] font-bold tracking-wider border ${badgeClass}">
                                 ${item.jenis || '-'}
                             </span>
                         </td>
                         <td class="px-5 py-4 align-top">
-                            <div class="text-sm font-bold text-zinc-100 leading-snug">${item.kegiatan || '-'}</div>
+                            <div class="text-sm font-bold text-zinc-200 leading-snug group-hover:text-amber-500 transition-colors">${item.kegiatan || '-'}</div>
                             <div class="text-xs font-medium text-zinc-500 mt-1"><i class="fas fa-map-marker-alt mr-1 text-amber-500/70"></i> ${item.tempat || '-'}</div>
+                            <div class="text-[10px] font-semibold text-zinc-600 mt-2 uppercase tracking-wide">DPL: ${item.dpl || '-'}</div>
                         </td>
-                        <td class="px-5 py-4 whitespace-nowrap align-top text-sm text-zinc-400 font-medium">${item.dpl || '-'}</td>
                     </tr>
                 `;
             });
